@@ -30,104 +30,144 @@
       <!-- Group content -->
       <div v-else>
         <!-- Group header -->
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-          <div>
-            <div class="flex items-center">
-              <NuxtLink to="/dashboard" class="text-indigo-600 hover:text-indigo-900 mr-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-              </NuxtLink>
-              <h1 class="text-2xl font-bold text-gray-900">{{ group?.name }}</h1>
-            </div>
-            <p class="mt-1 text-sm text-gray-500">
-              {{ group?.members.length }} members
-            </p>
+        <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
+          <div class="flex items-center">
+            <NuxtLink to="/dashboard" class="text-gray-400 hover:text-gray-600 mr-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </NuxtLink>
+            <h1 class="text-xl font-medium text-gray-900">{{ group?.name }}</h1>
+            <span class="ml-2 text-xs text-gray-500">{{ group?.members.length }} members</span>
           </div>
           <button 
             @click="showCreateEventModal = true"
-            class="mt-4 md:mt-0 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            class="text-xs text-indigo-600 hover:text-indigo-900"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Create Event
+            + New Event
           </button>
         </div>
 
-        <!-- Members list -->
-        <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
-          <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
-            <div>
-              <h3 class="text-lg leading-6 font-medium text-gray-900">Group Members</h3>
-              <p class="mt-1 max-w-2xl text-sm text-gray-500">People who can create and manage events in this group</p>
+        <!-- Two-column layout -->
+        <div class="flex flex-col md:flex-row gap-4">
+          <!-- Members list (left column) -->
+          <div class="w-full md:w-1/4 lg:w-1/5">
+            <div class="bg-white shadow sm:rounded-lg sticky top-4">
+              <div class="px-3 py-3 flex justify-between items-center border-b border-gray-200">
+                <h3 class="text-sm font-medium text-gray-900">Members</h3>
+                <button 
+                  @click="showEditGroupModal = true"
+                  class="text-indigo-600 hover:text-indigo-900"
+                  title="Edit Members"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </button>
+              </div>
+              <ul class="divide-y divide-gray-100">
+                <li v-for="member in group?.members" :key="member.id" class="px-3 py-2">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                      <div class="h-7 w-7 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-800 font-semibold text-xs">
+                        {{ getMemberInitials(member) }}
+                      </div>
+                      <div class="ml-2 truncate">
+                        <div class="text-xs font-medium text-gray-900">{{ member.name }}</div>
+                      </div>
+                    </div>
+                    <div v-if="member.id === group?.createdBy" class="text-xs text-indigo-600">
+                      ★
+                    </div>
+                  </div>
+                </li>
+              </ul>
             </div>
-            <button 
-              @click="showEditGroupModal = true"
-              class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
-              Edit Members
-            </button>
           </div>
-          <div class="border-t border-gray-200">
-            <ul role="list" class="divide-y divide-gray-200">
-              <li v-for="member in group?.members" :key="member.id" class="px-4 py-4 sm:px-6">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center">
-                    <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-800 font-semibold">
-                      {{ getMemberInitials(member) }}
-                    </div>
-                    <div class="ml-4">
-                      <div class="text-sm font-medium text-gray-900">{{ member.name }}</div>
-                      <div class="text-sm text-gray-500">{{ member.email }}</div>
-                    </div>
-                  </div>
-                  <div v-if="member.id === group?.createdBy" class="text-xs text-indigo-600 font-medium">
-                    Creator
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
 
-        <!-- Events section -->
-        <div>
-          <h2 class="text-xl font-bold text-gray-900 mb-4">Events</h2>
+          <!-- Events section (right column) -->
+          <div class="w-full md:w-3/4 lg:w-4/5">
+            <div class="flex justify-between items-center mb-3">
+              <h2 class="text-lg font-medium text-gray-900">Events</h2>
+
+              <!-- Display mode selector -->
+              <div class="flex items-center space-x-2 bg-white rounded-lg shadow-sm p-1 border border-gray-100">
+                <button 
+                  @click="displayMode = 'small'"
+                  class="p-1 rounded"
+                  :class="displayMode === 'small' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'"
+                  title="Small grid view"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                </button>
+                <button 
+                  @click="displayMode = 'card'"
+                  class="p-1 rounded"
+                  :class="displayMode === 'card' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'"
+                  title="Card view"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z" />
+                  </svg>
+                </button>
+                <button 
+                  @click="displayMode = 'large'"
+                  class="p-1 rounded"
+                  :class="displayMode === 'large' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'"
+                  title="Large card view"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" />
+                  </svg>
+                </button>
+                <button 
+                  @click="displayMode = 'list'"
+                  class="p-1 rounded"
+                  :class="displayMode === 'list' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'"
+                  title="List view"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
 
           <!-- Empty state -->
-          <div v-if="events.length === 0" class="bg-white shadow rounded-lg p-8 text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div v-if="events.length === 0" class="bg-white border border-gray-100 rounded-lg p-4 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <h3 class="mt-2 text-lg font-medium text-gray-900">No events yet</h3>
-            <p class="mt-1 text-sm text-gray-500">
-              Get started by creating a new event for this group.
-            </p>
-            <div class="mt-6">
-              <button 
-                @click="showCreateEventModal = true"
-                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-                Create Event
-              </button>
-            </div>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No events yet</h3>
+            <button 
+              @click="showCreateEventModal = true"
+              class="mt-3 text-xs text-indigo-600 hover:text-indigo-900"
+            >
+              + Create Event
+            </button>
           </div>
 
-          <!-- Events grid -->
-          <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <!-- Events grid or list based on display mode -->
+          <div v-else 
+            :class="{
+              'grid gap-3': displayMode !== 'list',
+              'grid-cols-1': true,
+              'sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4': displayMode === 'small',
+              'sm:grid-cols-2 lg:grid-cols-3': displayMode === 'card',
+              'sm:grid-cols-1 lg:grid-cols-2': displayMode === 'large',
+              'flex flex-col space-y-2': displayMode === 'list'
+            }"
+          >
             <EventCard 
               v-for="event in events" 
               :key="event.id" 
               :event="event"
+              :displayMode="displayMode"
               @delete="handleDeleteEvent"
             />
+          </div>
           </div>
         </div>
       </div>
@@ -271,6 +311,26 @@
                           placeholder="Family, Friends, Colleagues..."
                         />
                       </div>
+                    </div>
+
+                    <!-- Background Image -->
+                    <div class="mt-4">
+                      <label for="group-background" class="block text-sm font-medium text-gray-700">
+                        Background Image URL
+                      </label>
+                      <div class="mt-1">
+                        <input 
+                          type="url" 
+                          name="group-background" 
+                          id="group-background" 
+                          v-model="groupForm.background"
+                          class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" 
+                          placeholder="https://example.com/image.jpg"
+                        />
+                      </div>
+                      <p class="mt-1 text-xs text-gray-500">
+                        Optional: Add a URL to a background image for your group
+                      </p>
                     </div>
 
                     <!-- Members -->
@@ -444,6 +504,7 @@ const loading = ref(true);
 const error = ref('');
 const group = ref<Group | null>(null);
 const events = ref<Event[]>([]);
+const displayMode = ref<'card' | 'list' | 'small' | 'large'>('card');
 
 // Modal state
 const showCreateEventModal = ref(false);
@@ -455,6 +516,7 @@ const currentEventId = ref('');
 // Forms
 const groupForm = ref({
   name: '',
+  background: '',
   members: [] as User[]
 });
 
@@ -491,6 +553,7 @@ const fetchGroup = async () => {
       // Initialize group form with current group data
       groupForm.value = {
         name: fetchedGroup.name,
+        background: fetchedGroup.background || '',
         members: [...fetchedGroup.members]
       };
     } else {
@@ -569,7 +632,8 @@ const handleSubmitGroup = async () => {
     const updatedGroup = await groupStore.updateGroup(
       group.value.id,
       groupForm.value.name,
-      validMembers
+      validMembers,
+      groupForm.value.background
     );
 
     if (updatedGroup) {
@@ -660,6 +724,7 @@ const closeModals = () => {
   if (group.value) {
     groupForm.value = {
       name: group.value.name,
+      background: group.value.background || '',
       members: [...group.value.members]
     };
   }

@@ -1,22 +1,22 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50">
-    <div class="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
+  <div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+    <div class="max-w-md w-full space-y-8 p-8 bg-white dark:bg-gray-800 rounded-lg shadow-md">
       <div class="text-center">
-        <h1 class="text-3xl font-bold text-gray-900">Gift List Manager</h1>
-        <p class="mt-2 text-sm text-gray-600">Sign in to manage your gift lists</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Gift List Manager</h1>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">Sign in to manage your gift lists</p>
       </div>
 
       <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
         <div class="rounded-md shadow-sm -space-y-px">
           <div>
-            <label for="email-address" class="sr-only">Email address</label>
+            <label for="username" class="sr-only">Email address</label>
             <input 
-              id="email-address" 
-              name="email" 
-              type="email" 
-              autocomplete="email" 
-              required 
-              v-model="email"
+              id="username" 
+              name="username"
+              type="text"
+              autocomplete="username"
+              required
+              v-model="username"
               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" 
               placeholder="Email address" 
             />
@@ -117,7 +117,7 @@ import { useRouter } from 'vue-router';
 import { useUserStore } from '~/stores/user';
 
 // Define reactive variables
-const email = ref('');
+const username = ref('');
 const password = ref('');
 const loading = ref(false);
 const error = ref('');
@@ -132,7 +132,7 @@ const handleLogin = async () => {
   error.value = '';
 
   try {
-    const success = await userStore.login(email.value, password.value);
+    const success = await userStore.login(username.value, btoa(password.value));
 
     if (success) {
       router.push('/dashboard');
@@ -169,12 +169,21 @@ const handleDemoLogin = async () => {
 };
 
 // Handle registration
-const handleRegister = () => {
-  // In a real app, this would navigate to a registration page
-  // For this demo, we'll just simulate a successful registration
-  email.value = 'new@example.com';
-  password.value = 'password';
-  handleLogin();
+const handleRegister = async () => {
+    try {
+        const success = await userStore.register('Test', username.value, btoa(password.value));
+        console.log('Test', username.value, btoa(password.value));
+        if (success) {
+            router.push('/dashboard');
+        } else {
+            error.value = 'Failed to login with demo account';
+        }
+    } catch (err) {
+        error.value = 'An error occurred during login';
+        console.error(err);
+    } finally {
+        loading.value = false;
+    }
 };
 
 // Redirect to dashboard if already logged in

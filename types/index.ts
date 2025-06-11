@@ -5,6 +5,8 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  avatar?: string; // URL to the user's avatar image
+  isAdmin?: boolean; // Flag to indicate if user has admin privileges
 }
 
 // Group model
@@ -13,6 +15,7 @@ export interface Group {
   name: string;
   members: User[];
   createdBy: string; // User ID
+  background?: string; // URL to the group's background image
 }
 
 // Event model

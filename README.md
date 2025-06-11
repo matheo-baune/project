@@ -63,7 +63,48 @@ Start the development server on `http://localhost:3000`:
 npm run dev
 # or
 yarn dev
+# or
+bun run dev
+# or
+bun run start  # Recommended for Bun users
 ```
+
+### Using Bun
+
+This project is configured to work optimally with Bun. If you're using Bun as your JavaScript runtime and package manager, you can use the following commands:
+
+```bash
+# Install dependencies
+bun install
+
+# Start the development server
+bun run dev
+# or
+bun run start
+```
+
+The `bun run start` command uses a custom script that provides better error handling and process management when running the Nuxt development server with Bun.
+
+#### Bun Configuration
+
+This project includes the following Bun-specific configuration files:
+
+- `bunfig.toml`: Contains Bun configuration settings for installation, running, development, testing, and debugging.
+- `package.json`: Includes a "bun" section with trusted dependencies.
+- `start.js`: A custom script for running the Nuxt development server with Bun.
+
+These configurations ensure that Bun works optimally with this Nuxt.js project.
+
+### Using WebStorm Services
+
+If you're using WebStorm, you can run the development server directly from the Services tab:
+
+1. Open your project in WebStorm
+2. Go to the Services tab (usually at the bottom of the window)
+3. Find "Nuxt Dev Server" under the Bun section
+4. Click the play button to start the server
+
+This configuration is already set up in the project's `.idea/workspace.xml` file.
 
 ## Database Management
 
