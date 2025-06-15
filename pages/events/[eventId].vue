@@ -180,10 +180,8 @@ const isCreator = computed(() => {
 onMounted(async () => {
   // Check if user is logged in
   if (!userStore.isLoggedIn) {
-    userStore.initUser(); // For demo purposes
-    // In a real app, we would redirect to login
-    // router.push('/login');
-    // return;
+    await router.push('/login');
+    return;
   }
 
   await fetchEvent();

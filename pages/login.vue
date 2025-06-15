@@ -133,9 +133,8 @@ const handleLogin = async () => {
 
   try {
     const success = await userStore.login(username.value, btoa(password.value));
-
     if (success) {
-      router.push('/dashboard');
+      await router.push('/dashboard');
     } else {
       error.value = 'Invalid email or password';
     }

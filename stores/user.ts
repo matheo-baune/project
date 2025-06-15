@@ -17,7 +17,7 @@ export const useUserStore = defineStore('user', {
 
   actions: {
     // Simulate login
-    async login(email: string, password: string) {
+    async login(username: string, password: string) {
       this.loading = true;
       this.error = null;
 
@@ -28,11 +28,11 @@ export const useUserStore = defineStore('user', {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ username, password }),
         });
 
         if (!response.ok) {
-          this.error = 'Invalid email or password';
+          this.error = 'Invalid username or password';
           this.loading = false;
           return false;
         }
@@ -40,12 +40,11 @@ export const useUserStore = defineStore('user', {
         this.currentUser = {
           id: data.id,
           name: data.name,
-          email: data.email,
-          avatar: data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=6366F1&color=fff`, // Default avatar
-          isAdmin: data.isAdmin || false,
+          email: data.username,
+          avatar: data.avatar ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username)}&background=6366F1&color=fff`, // Default avatar
+          isAdmin: data.isAdmin ?? false,
         };
-
-        console.log('User logged in:', this.currentUser);
+        this.isAuthenticated = true;
         return true;
       } catch (error) {
         this.error = 'Failed to login';
@@ -92,11 +91,10 @@ export const useUserStore = defineStore('user', {
         });
         if (!response.ok) {
           const errorData = await response.json();
-          this.error = errorData.message || 'Registration failed';
+          this.error = errorData.message ?? 'Registration failed';
           this.loading = false;
           return false;
         }
-        console.log('Registration response:', response);
         const data = await response.json();
         this.currentUser = {
           id: data.id,
@@ -106,7 +104,6 @@ export const useUserStore = defineStore('user', {
           isAdmin: false, // Default to false for regular users
         };
         this.isAuthenticated = true;
-        console.log('User registered:', this.currentUser);
 
         return true;
       } catch (error) {
@@ -115,21 +112,6 @@ export const useUserStore = defineStore('user', {
       } finally {
         this.loading = false;
       }
-    },
-
-    // Initialize user from session/local storage
-  initUser(asAdmin = false) {
-    // For demo purposes, we'll just set a mock user
-    this.currentUser = {
-      id: '1',
-      name: asAdmin ? 'Admin User' : 'John Doe',
-      email: asAdmin ? 'admin@example.com' : 'john@example.com',
-      avatar: asAdmin 
-        ? 'https://ui-avatars.com/api/?name=Admin+User&background=FF5722&color=fff'
-        : 'https://ui-avatars.com/api/?name=John+Doe&background=6366F1&color=fff', // Default avatar
-      isAdmin: asAdmin,
-    };
-    this.isAuthenticated = true;
     },
 
     // Update user avatar
