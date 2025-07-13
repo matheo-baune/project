@@ -5,13 +5,25 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
-import { useThemeStore } from '~/stores/theme';
+import { onMounted, ref } from 'vue';
+import { useThemeStore, useUserStore } from '~/stores';
 
-const themeStore = useThemeStore();
+// Use ref to store the store instances
+const themeStore = ref(null);
+const userStore = ref(null);
 
-// Initialize theme on app load
+// Initialize stores on app load
 onMounted(() => {
-  themeStore.initTheme();
+  try {
+    // Access the stores only after the component is mounted
+    themeStore.value = useThemeStore();
+    themeStore.value.initTheme();
+
+    // Initialize user store
+    userStore.value = useUserStore();
+    userStore.value.init();
+  } catch (error) {
+    console.error('Failed to initialize stores:', error);
+  }
 });
 </script>

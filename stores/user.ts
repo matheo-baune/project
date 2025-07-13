@@ -16,11 +16,25 @@ export const useUserStore = defineStore('user', {
   },
 
   actions: {
+    // Initialize user from localStorage (for "Remember me" functionality)
+    init() {
+      try {
+        const storedUser = localStorage.getItem('user');
+        const isAuthenticated = localStorage.getItem('isAuthenticated');
+
+        if (storedUser && isAuthenticated === 'true') {
+          this.currentUser = JSON.parse(storedUser);
+          this.isAuthenticated = true;
+        }
+      } catch (error) {
+        console.error('Failed to initialize user from localStorage:', error);
+      }
+    },
     // Simulate login
-    async login(username: string, password: string) {
+    async login(username: string, password: string, rememberMe: boolean = false) {
       this.loading = true;
       this.error = null;
-
+      console.log('Start Login :', { username, password, rememberMe });
       try {
         //call the API to authenticate user api/auth/login
         const response = await fetch('/api/auth/login', {
@@ -31,6 +45,7 @@ export const useUserStore = defineStore('user', {
           body: JSON.stringify({ username, password }),
         });
 
+        console.log('Login successful:', { username, password, rememberMe });
         if (!response.ok) {
           this.error = 'Invalid username or password';
           this.loading = false;
@@ -45,6 +60,13 @@ export const useUserStore = defineStore('user', {
           isAdmin: data.isAdmin ?? false,
         };
         this.isAuthenticated = true;
+
+        // If rememberMe is true, store the user data in localStorage
+        if (rememberMe) {
+          localStorage.setItem('user', JSON.stringify(this.currentUser));
+          localStorage.setItem('isAuthenticated', 'true');
+        }
+
         return true;
       } catch (error) {
         this.error = 'Failed to login';
@@ -64,6 +86,11 @@ export const useUserStore = defineStore('user', {
 
         this.currentUser = null;
         this.isAuthenticated = false;
+
+        // Clear localStorage
+        localStorage.removeItem('user');
+        localStorage.removeItem('isAuthenticated');
+
         return true;
       } catch (error) {
         this.error = 'Failed to logout';

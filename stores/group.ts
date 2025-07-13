@@ -39,12 +39,16 @@ export const useGroupStore = defineStore('group', {
                 const userStore = useUserStore();
                 const userId = userStore.currentUser?.id;
 
-                let response = await fetch('/api/groups', {
+                if (!userId) {
+                    this.error = 'User not authenticated';
+                    return [];
+                }
+
+                let response = await fetch(`/api/user/${userId}/groups`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({userId}),
                 });
 
                 if (!response.ok) {
@@ -52,41 +56,8 @@ export const useGroupStore = defineStore('group', {
                     return [];
                 }
                 const data = await response.json();
-                this.groups = data.groups as Group[];
-                /*// Mock groups data
-                this.groups = [
-                  {
-                    id: '1',
-                    name: 'Family',
-                    members: [
-                      { id: '1', name: 'John Doe', email: 'john@example.com', avatar: 'https://ui-avatars.com/api/?name=John+Doe&background=6366F1&color=fff' },
-                      { id: '2', name: 'Jane Doe', email: 'jane@example.com', avatar: 'https://ui-avatars.com/api/?name=Jane+Doe&background=EF4444&color=fff' }
-                    ],
-                    createdBy: '1',
-                    background: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
-                  },
-                  {
-                    id: '2',
-                    name: 'Friends',
-                    members: [
-                      { id: '1', name: 'John Doe', email: 'john@example.com', avatar: 'https://ui-avatars.com/api/?name=John+Doe&background=6366F1&color=fff' },
-                      { id: '3', name: 'Bob Smith', email: 'bob@example.com', avatar: 'https://ui-avatars.com/api/?name=Bob+Smith&background=10B981&color=fff' }
-                    ],
-                    createdBy: '1',
-                    background: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
-                  },
-                  {
-                    id: '3',
-                    name: 'Colleagues',
-                    members: [
-                      { id: '1', name: 'John Doe', email: 'john@example.com', avatar: 'https://ui-avatars.com/api/?name=John+Doe&background=6366F1&color=fff' },
-                      { id: '4', name: 'Alice Johnson', email: 'alice@example.com', avatar: 'https://ui-avatars.com/api/?name=Alice+Johnson&background=F59E0B&color=fff' }
-                    ],
-                    createdBy: '1',
-                    background: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
-                  }
-                ];*/
-
+                console.log('Fetched groups:', data.userGroups);
+                this.groups = data.userGroups as Group[];
                 return this.groups;
             } catch (error) {
                 this.error = 'Failed to fetch groups';
@@ -161,22 +132,11 @@ export const useGroupStore = defineStore('group', {
             this.error = null;
 
             try {
-                // Simulate API call
-                await new Promise(resolve => setTimeout(resolve, 800));
-
-                const groupIndex = this.groups.findIndex(group => group.id === id);
-
-                if (groupIndex === -1) {
-                    this.error = 'Group not found';
-                    return null;
-                }
-
                 const userStore = useUserStore();
                 const userId = userStore.currentUser?.id;
 
-                // Check if user is the creator of the group
-                if (this.groups[groupIndex].createdBy !== userId) {
-                    this.error = 'Not authorized to update this group';
+                if (!userId) {
+                    this.error = 'User not authenticated';
                     return null;
                 }
 
@@ -186,15 +146,29 @@ export const useGroupStore = defineStore('group', {
                     members.push(userStore.currentUser);
                 }
 
-                // Update group
-                this.groups[groupIndex] = {
-                    ...this.groups[groupIndex],
-                    name,
-                    members,
-                    background
-                };
+                const response = await fetch(`/api/groups/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, members, background, createdBy: userId }),
+                });
 
-                return this.groups[groupIndex];
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    this.error = errorData.message || 'Failed to update group';
+                    return null;
+                }
+
+                const updatedGroup = await response.json() as Group;
+
+                // Update the group in the local state
+                const groupIndex = this.groups.findIndex(group => group.id === id);
+                if (groupIndex !== -1) {
+                    this.groups[groupIndex] = updatedGroup;
+                }
+
+                return updatedGroup;
             } catch (error) {
                 this.error = 'Failed to update group';
                 return null;
@@ -209,27 +183,33 @@ export const useGroupStore = defineStore('group', {
             this.error = null;
 
             try {
-                // Simulate API call
-                await new Promise(resolve => setTimeout(resolve, 600));
-
-                const groupIndex = this.groups.findIndex(group => group.id === id);
-
-                if (groupIndex === -1) {
-                    this.error = 'Group not found';
-                    return false;
-                }
-
                 const userStore = useUserStore();
                 const userId = userStore.currentUser?.id;
 
-                // Check if user is the creator of the group
-                if (this.groups[groupIndex].createdBy !== userId) {
-                    this.error = 'Not authorized to delete this group';
+                if (!userId) {
+                    this.error = 'User not authenticated';
                     return false;
                 }
 
-                // Delete group
-                this.groups.splice(groupIndex, 1);
+                const response = await fetch(`/api/groups/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ userId }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    this.error = errorData.message || 'Failed to delete group';
+                    return false;
+                }
+
+                // Remove the group from the local state
+                const groupIndex = this.groups.findIndex(group => group.id === id);
+                if (groupIndex !== -1) {
+                    this.groups.splice(groupIndex, 1);
+                }
 
                 if (this.currentGroup?.id === id) {
                     this.currentGroup = null;

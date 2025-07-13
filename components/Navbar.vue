@@ -5,7 +5,7 @@
         <div class="flex">
           <div class="flex-shrink-0 flex items-center">
             <NuxtLink to="/dashboard" class="text-xl font-bold text-indigo-600 dark:text-indigo-400">
-              Gift List Manager
+              {{ $t('navbar.appName') }}
             </NuxtLink>
           </div>
           <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
@@ -17,7 +17,7 @@
             >
               <span class="flex items-center">
                 <span v-if="$route.path === '/dashboard'" class="w-2 h-2 bg-indigo-500 rounded-full mr-2"></span>
-                Dashboard
+                {{ $t('navbar.dashboard') }}
               </span>
             </NuxtLink>
             <NuxtLink 
@@ -28,7 +28,7 @@
             >
               <span class="flex items-center">
                 <span v-if="$route.path.startsWith('/admin')" class="w-2 h-2 bg-indigo-500 rounded-full mr-2"></span>
-                Admin
+                {{ $t('navbar.admin') }}
               </span>
             </NuxtLink>
           </div>
@@ -38,7 +38,7 @@
           <button 
             @click="themeStore.toggleTheme"
             class="p-1 rounded-full text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:text-gray-300 dark:hover:text-white"
-            :title="themeStore.isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+            :title="themeStore.isDark ? $t('navbar.switchToLightMode') : $t('navbar.switchToDarkMode')"
           >
             <!-- Sun icon for dark mode -->
             <svg 
@@ -64,6 +64,11 @@
             </svg>
           </button>
 
+          <!-- Language switcher -->
+          <div class="ml-3">
+            <LanguageSwitcher />
+          </div>
+
           <!-- Profile dropdown -->
           <div class="ml-3 relative">
             <div>
@@ -75,7 +80,7 @@
                 aria-expanded="false" 
                 aria-haspopup="true"
               >
-                <span class="sr-only">Open user menu</span>
+                <span class="sr-only">{{ $t('navbar.openUserMenu') }}</span>
                 <div class="h-8 w-8 rounded-full overflow-hidden">
                   <img v-if="user?.avatar" :src="user.avatar" alt="User avatar" class="h-full w-full object-cover" />
                   <div v-else class="h-full w-full bg-indigo-100 flex items-center justify-center text-indigo-800 font-semibold">
@@ -95,7 +100,7 @@
               tabindex="-1"
             >
               <div class="px-4 py-2 text-xs text-gray-500">
-                Signed in as <span class="font-medium">{{ user?.email }}</span>
+                {{ $t('navbar.signedInAs') }} <span class="font-medium">{{ user?.email }}</span>
               </div>
               <div class="border-t border-gray-100"></div>
               <NuxtLink 
@@ -105,7 +110,7 @@
                 tabindex="-1" 
                 id="user-menu-item-0"
               >
-                Your Profile
+                {{ $t('navbar.yourProfile') }}
               </NuxtLink>
               <a 
                 href="#" 
@@ -114,7 +119,7 @@
                 tabindex="-1" 
                 id="user-menu-item-1"
               >
-                Settings
+                {{ $t('navbar.settings') }}
               </a>
               <a 
                 href="#" 
@@ -124,7 +129,7 @@
                 tabindex="-1" 
                 id="user-menu-item-2"
               >
-                Sign out
+                {{ $t('navbar.signOut') }}
               </a>
             </div>
           </div>
@@ -138,7 +143,7 @@
             aria-controls="mobile-menu" 
             aria-expanded="false"
           >
-            <span class="sr-only">Open main menu</span>
+            <span class="sr-only">{{ $t('navbar.openMenu') }}</span>
             <!-- Icon when menu is closed -->
             <svg 
               v-if="!isMobileMenuOpen" 
@@ -179,7 +184,7 @@
         >
           <div class="flex items-center">
             <span v-if="$route.path === '/dashboard'" class="w-2 h-2 bg-indigo-500 rounded-full mr-2"></span>
-            Dashboard
+            {{ $t('navbar.dashboard') }}
           </div>
         </NuxtLink>
         <NuxtLink 
@@ -246,6 +251,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '~/stores/user';
 import { useThemeStore } from '~/stores/theme';
+import LanguageSwitcher from '~/components/LanguageSwitcher.vue';
 
 const router = useRouter();
 const userStore = useUserStore();

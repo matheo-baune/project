@@ -1,22 +1,31 @@
 import db from "~/server/db";
 
-async function getUserGroups(userId: string) {
-    // Query to fetch groups where the user is a member
-    const query = `
-        SELECT g.id, g.name, g.description
+async function getUserGroupsWithMembers(userId: string) {
+    // Récupère les groupes où l'utilisateur est membre
+    const groupQuery = `
+        SELECT g.id, g.name, g.background, g.created_by, g.created_at
         FROM groups g
-        JOIN group_members gm ON g.id = gm.group_id
+                 JOIN group_members gm ON g.id = gm.group_id
         WHERE gm.user_id = $1
     `;
+    const { rows: groups } = await db.query(groupQuery, [userId]);
 
-    try {
-        const { rows } = await db.query(query, [userId]);
-        return rows;
-    } catch (error) {
-        console.error('Error fetching user groups:', error);
-        throw new Error('Database query failed');
+    // Pour chaque groupe, récupère les membres
+    const groupList = [];
+    for (const group of groups) {
+        const memberQuery = `
+            SELECT u.id, u.name
+            FROM users u
+            JOIN group_members gm ON u.id = gm.user_id
+            WHERE gm.group_id = $1
+        `;
+        const { rows: members } = await db.query(memberQuery, [group.id]);
+        groupList.push({
+            ...group,
+            members
+        });
     }
-
+    return groupList;
 }
 
 export default defineEventHandler(async (event) => {
@@ -26,14 +35,10 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
-        // Fetch the user's groups from the database
-        // join the groups table with the user_id with group_members
-        const userGroups = await getUserGroups(userId);
-
+        const userGroups = await getUserGroupsWithMembers(userId);
         if (userGroups.length === 0) {
-        return { message: 'No groups found for this user' };
+            return { message: 'No groups found for this user' };
         }
-
         return { userGroups };
     } catch (error) {
         console.error('Error fetching user groups:', error);

@@ -59,9 +59,9 @@ CREATE TABLE IF NOT EXISTS reservations (
 );
 
 -- Insert some sample data
-INSERT INTO users (name, email, password) VALUES
+INSERT INTO users (name, username, password) VALUES
   ('John Doe', 'john@example.com', 'password_hash_placeholder'),
   ('Jane Doe', 'jane@example.com', 'password_hash_placeholder'),
   ('Bob Smith', 'bob@example.com', 'password_hash_placeholder'),
   ('Alice Johnson', 'alice@example.com', 'password_hash_placeholder')
-ON CONFLICT (email) DO NOTHING;
+ON CONFLICT (username) DO NOTHING;

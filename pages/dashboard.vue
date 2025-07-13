@@ -378,9 +378,8 @@ const fetchGroups = async () => {
   error.value = '';
 
   try {
-
-
       groups.value = await groupStore.fetchGroups();
+      console.log('Fetched groups:', groups.value);
   } catch (err) {
     console.error('Failed to fetch groups:', err);
     error.value = 'Failed to load groups. Please try again.';
