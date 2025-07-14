@@ -73,7 +73,7 @@
                         {{ getMemberInitials(member) }}
                       </div>
                       <div class="ml-2 truncate">
-                        <div class="text-xs font-medium text-gray-900">{{ member.name }}</div>
+                        <div class="text-xs font-medium text-gray-900">{{ member.firstname + ' ' + member.lastname }}</div>
                       </div>
                     </div>
                     <div v-if="member.id === group?.createdBy" class="text-xs text-indigo-600">
@@ -486,9 +486,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { Group, Event, User } from '~/types';
-import { useUserStore } from '~/stores/user';
-import { useGroupStore } from '~/stores/group';
-import { useEventStore } from '~/stores/event';
+import { useUserStore, useGroupStore, useEventStore } from '~/stores';
 
 const route = useRoute();
 const router = useRouter();
@@ -544,7 +542,6 @@ const fetchGroup = async () => {
 
   try {
     const fetchedGroup = await groupStore.fetchGroup(groupId);
-
     if (fetchedGroup) {
       group.value = fetchedGroup;
 
@@ -584,15 +581,12 @@ const fetchEvents = async () => {
 };
 
 // Get member initials for avatar
-const getMemberInitials = (member: User) => {
-  if (!member.name) return '?';
+const getMemberInitials = (user: User) => {
+    if (!user?.firstname) return '?';
 
-  const nameParts = member.name.split(' ');
-  if (nameParts.length === 1) {
-    return nameParts[0].charAt(0).toUpperCase();
-  }
-
-  return (nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)).toUpperCase();
+    const firstNamePart = user.firstname.charAt(0).toUpperCase();
+    const lastNamePart = user.lastname.charAt(0).toUpperCase();
+    return firstNamePart + lastNamePart;
 };
 
 // Add a new member to the form

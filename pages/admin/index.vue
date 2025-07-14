@@ -197,12 +197,18 @@
 <script setup lang="ts">
 import {ref, onMounted} from 'vue';
 import {useRouter} from 'vue-router';
-import {useUserStore} from '~/stores/user';
-import {useGroupStore} from '~/stores/group';
+import {
+    useUserStore,
+    useGroupStore,
+    useEventStore,
+    useGiftStore
+} from '~/stores';
 
 const router = useRouter();
 const userStore = useUserStore();
 const groupStore = useGroupStore();
+const eventStore = useEventStore();
+const giftStore = useGiftStore();
 
 // Stats for the admin dashboard
 const stats = ref({
@@ -231,17 +237,18 @@ onMounted(async () => {
 // Fetch stats for the dashboard
 const fetchStats = async () => {
     try {
-        // In a real app, we would fetch these from an API
-        // For now, we'll use mock data
-
         // Get groups count from the store
         const groups = await groupStore.fetchGroups();
         stats.value.groups = groups.length;
 
-        // Mock other stats
-        stats.value.users = 10;
-        stats.value.events = 15;
-        stats.value.gifts = 25;
+        const users = await userStore.fetchAllUsers();
+        stats.value.users = users.length;
+
+        const events = await eventStore.fetchAllEvents();
+        stats.value.events = events.length;
+
+        const gifts = await giftStore.fetchAllGifts();
+        stats.value.gifts = gifts.length;
     } catch (err) {
         console.error('Failed to fetch stats:', err);
     }

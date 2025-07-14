@@ -3,6 +3,13 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
 
+  // Enable server middleware for case conversion
+  nitro: {
+    experimental: {
+      openAPI: true
+    }
+  },
+
   // Modules required for the gift list application
   modules: [
     '@nuxtjs/tailwindcss',

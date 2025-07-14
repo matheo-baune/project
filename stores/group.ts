@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import type { Group, User } from '~/types';
-import { useUserStore } from './user';
+import { useUserStore } from '~/stores';
 
 export const useGroupStore = defineStore('group', {
     state: () => ({
@@ -56,9 +56,8 @@ export const useGroupStore = defineStore('group', {
                     return [];
                 }
                 const data = await response.json();
-                console.log('Fetched groups:', data.userGroups);
                 this.groups = data.userGroups as Group[];
-                return this.groups;
+                return this.groups ?? [];
             } catch (error) {
                 this.error = 'Failed to fetch groups';
                 return [];
@@ -68,25 +67,36 @@ export const useGroupStore = defineStore('group', {
         },
 
         // Fetch a single group by ID
-        async fetchGroup(id: string) {
+        async fetchGroup(id: string) : Promise<Group | null> {
             this.loading = true;
             this.error = null;
 
             try {
-                // Simulate API call
-                await new Promise(resolve => setTimeout(resolve, 500));
+                const userStore = useUserStore();
+                const userId = userStore.currentUser?.id;
 
-                const group = this.getGroupById(id);
-
-                if (group) {
-                    this.currentGroup = group;
-                    return group;
+                if (!userId) {
+                    this.error = 'User not authenticated';
+                    return null;
                 }
 
-                this.error = 'Group not found';
-                return null;
+                let response = await fetch(`/api/groups/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!response.ok) {
+                    this.error = 'Failed to fetch groups';
+                    return null;
+                }
+
+                const data = await response.json();
+                this.currentGroup = data as Group;
+                return this.currentGroup;
             } catch (error) {
-                this.error = 'Failed to fetch group';
+                this.error = 'Failed to fetch groups';
                 return null;
             } finally {
                 this.loading = false;
@@ -115,9 +125,16 @@ export const useGroupStore = defineStore('group', {
                     body: JSON.stringify({ name, members, background, createdBy: userId }),
                 });
 
-                const data = await response.json() as Group;
-                this.groups.push(data);
-                return data;
+                const data = await response.json();
+
+                if (!response.ok) {
+                    this.error = data.message || 'Failed to create group';
+                    return null;
+                }
+
+                const newGroup = data as Group;
+                this.groups.push(newGroup);
+                return newGroup;
             } catch (error) {
                 this.error = 'Failed to create group';
                 return null;

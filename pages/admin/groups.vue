@@ -386,8 +386,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import type { Group, User } from '~/types';
-import { useUserStore } from '~/stores/user';
-import { useGroupStore } from '~/stores/group';
+import { useUserStore, useGroupStore } from '~/stores';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -586,15 +585,12 @@ const handleSubmitGroup = async () => {
 };
 
 // Get member initials for avatar placeholder
-const getMemberInitials = (member: User) => {
-  if (!member.name) return '?';
+const getMemberInitials = (user: User) => {
+    if (!user?.firstname) return '?';
 
-  const nameParts = member.name.split(' ');
-  if (nameParts.length === 1) {
-    return nameParts[0].charAt(0).toUpperCase();
-  }
-
-  return (nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)).toUpperCase();
+    const firstNamePart = user.firstname.charAt(0).toUpperCase();
+    const lastNamePart = user.lastname.charAt(0).toUpperCase();
+    return firstNamePart + lastNamePart;
 };
 
 // Close all modals and reset form

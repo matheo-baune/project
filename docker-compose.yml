@@ -5,9 +5,9 @@ services:
     image: postgres:14
     container_name: gift-list-postgres
     environment:
-      POSTGRES_USER: giftuser
-      POSTGRES_PASSWORD: giftpassword
-      POSTGRES_DB: giftlistdb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: admin
     ports:
       - "5432:5432"
     volumes:

@@ -118,7 +118,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { Gift } from '~/types';
-import { useUserStore } from '~/stores/user';
+import { useUserStore } from '~/stores/index';
 
 const props = defineProps<{
   gift: Gift;

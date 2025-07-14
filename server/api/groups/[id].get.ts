@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
         
         // Query to fetch the group members
         const membersQuery = `
-            SELECT u.id, u.name, u.username, u.avatar
+            SELECT u.id, u.lastname, u.firstname, u.email, u.username
             FROM users u
             JOIN group_members gm ON u.id = gm.user_id
             WHERE gm.group_id = $1
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
             ...group,
             members
         };
-    } catch (error) {
+    } catch (error:any) {
         console.error('Error fetching group:', error);
         throw createError({ 
             statusCode: error.statusCode || 500, 

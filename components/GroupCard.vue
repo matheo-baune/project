@@ -33,7 +33,7 @@
           </template>
           <div 
             v-if="group.members.length > maxDisplayMembers" 
-            class="inline-block h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-semibold text-xs"
+            class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-semibold text-xs"
             :title="remainingMembersNames"
           >
             +{{ group.members.length - maxDisplayMembers }}
@@ -259,14 +259,11 @@ const backgroundStyle = computed(() => {
 });
 
 // Get member initials for avatar
-const getMemberInitials = (member: User) => {
-  if (!member.name) return '?';
+const getMemberInitials = (user: User) => {
+    if (!user?.firstname) return '?';
 
-  const nameParts = member.name.split(' ');
-  if (nameParts.length === 1) {
-    return nameParts[0].charAt(0).toUpperCase();
-  }
-
-  return (nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)).toUpperCase();
+    const firstNamePart = user.firstname.charAt(0).toUpperCase();
+    const lastNamePart = user.lastname.charAt(0).toUpperCase();
+    return firstNamePart + lastNamePart;
 };
 </script>

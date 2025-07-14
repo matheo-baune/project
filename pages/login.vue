@@ -185,7 +185,7 @@ const handleRegister = async () => {
     error.value = '';
 
     try {
-        const success = await userStore.register('Test', username.value, password.value);
+        const success = await userStore.register('Test', username.value, btoa(password.value));
         if (success) {
             await router.push('/dashboard');
         } else {

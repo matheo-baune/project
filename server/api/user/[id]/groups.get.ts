@@ -14,7 +14,7 @@ async function getUserGroupsWithMembers(userId: string) {
     const groupList = [];
     for (const group of groups) {
         const memberQuery = `
-            SELECT u.id, u.name
+            SELECT u.id, u.firstname, u.lastname, u.email, u.avatar
             FROM users u
             JOIN group_members gm ON u.id = gm.user_id
             WHERE gm.group_id = $1

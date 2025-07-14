@@ -6,7 +6,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
-import { useThemeStore, useUserStore } from '~/stores';
+import { useThemeStore, useUserStore } from '~/stores/index.js';
 
 // Use ref to store the store instances
 const themeStore = ref(null);

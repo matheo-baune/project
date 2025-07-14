@@ -202,14 +202,11 @@ onMounted(() => {
 
 // Get user initials for avatar placeholder
 const getUserInitials = () => {
-  if (!user.value?.name) return '?';
+    if (!user?.value.firstname) return '?';
 
-  const nameParts = user.value.name.split(' ');
-  if (nameParts.length === 1) {
-    return nameParts[0].charAt(0).toUpperCase();
-  }
-
-  return (nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)).toUpperCase();
+    const firstNamePart = user.value.firstname.charAt(0).toUpperCase();
+    const lastNamePart = user.value.lastname.charAt(0).toUpperCase();
+    return firstNamePart + lastNamePart;
 };
 
 // Select an avatar from the options

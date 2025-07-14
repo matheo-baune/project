@@ -47,7 +47,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
-            Create Group
+            Create Groupa
           </button>
         </div>
       </div>
@@ -334,8 +334,7 @@
 import {onMounted, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import type {Group, User} from '~/types';
-import {useUserStore} from '~/stores/user';
-import {useGroupStore} from '~/stores/group';
+import {useUserStore, useGroupStore} from '~/stores';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -369,6 +368,7 @@ onMounted(async () => {
       return;
   }
 
+
   await fetchGroups();
 });
 
@@ -379,7 +379,6 @@ const fetchGroups = async () => {
 
   try {
       groups.value = await groupStore.fetchGroups();
-      console.log('Fetched groups:', groups.value);
   } catch (err) {
     console.error('Failed to fetch groups:', err);
     error.value = 'Failed to load groups. Please try again.';
@@ -498,15 +497,12 @@ const handleSubmitGroup = async () => {
 
 
 // Get member initials for avatar placeholder
-const getMemberInitials = (member: User) => {
-  if (!member.name) return '?';
+const getMemberInitials = (user: User) => {
+    if (!user?.firstname) return '?';
 
-  const nameParts = member.name.split(' ');
-  if (nameParts.length === 1) {
-    return nameParts[0].charAt(0).toUpperCase();
-  }
-
-  return (nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)).toUpperCase();
+    const firstNamePart = user.firstname.charAt(0).toUpperCase();
+    const lastNamePart = user.lastname.charAt(0).toUpperCase();
+    return firstNamePart + lastNamePart;
 };
 
 // Close all modals and reset form

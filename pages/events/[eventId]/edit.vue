@@ -81,14 +81,13 @@
           </button>
         </div>
 
-        <!-- Add Gift Form -->
-        <div v-if="showAddGiftForm" class="mb-8">
-          <GiftForm 
-            :event-id="eventId"
-            @submit="handleCreateGift"
-            @cancel="showAddGiftForm = false"
-          />
-        </div>
+        <!-- Gift Form Modal -->
+        <GiftFormModal
+          :is-open="showAddGiftForm"
+          :event-id="eventId"
+          @submit="handleCreateGift"
+          @close="showAddGiftForm = false"
+        />
 
         <!-- Edit Gift Form -->
         <div v-if="showEditGiftForm && selectedGift" class="mb-8">
