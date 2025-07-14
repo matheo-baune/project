@@ -9,7 +9,7 @@ export interface User {
     email: string;
     avatar?: string; // URL to the user's avatar image
     isAdmin?: boolean; // Flag to indicate if user has admin privileges
-    createdAt?: string; // ISO date string for when the user was created
+    createdAt: string; // ISO date string for when the user was created
 }
 
 // Group model

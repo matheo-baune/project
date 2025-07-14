@@ -1,4 +1,4 @@
-import db from "~/server/db";
+import {query} from "~/server/db";
 
 export default defineEventHandler(async (event) => {
     const groupId = event.context.params?.id;
@@ -15,14 +15,15 @@ export default defineEventHandler(async (event) => {
             WHERE id = $1
         `;
         
-        const groupResult = await db.query(groupQuery, [groupId]);
+        const groupResult = await query(groupQuery, [groupId]);
         
         if (groupResult.rows.length === 0) {
             throw createError({ statusCode: 404, message: 'Group not found' });
         }
         
         const group = groupResult.rows[0];
-        
+
+
         // Query to fetch the group members
         const membersQuery = `
             SELECT u.id, u.lastname, u.firstname, u.email, u.username
@@ -31,7 +32,7 @@ export default defineEventHandler(async (event) => {
             WHERE gm.group_id = $1
         `;
         
-        const membersResult = await db.query(membersQuery, [groupId]);
+        const membersResult = await query(membersQuery, [groupId]);
         const members = membersResult.rows;
 
         // Return the group with its members

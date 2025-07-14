@@ -9,7 +9,6 @@ export default defineEventHandler(async (event) => {
         throw createError({statusCode: 400, statusMessage: 'Missing required fields'});
     }
 
-    console.log(`Login attempt for user: ${username} with password: ${password}`);
     // Check if user exists
     const result = await query(
         'SELECT * FROM users WHERE (username = $1 or email=$1) AND password = $2',

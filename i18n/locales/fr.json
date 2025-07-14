@@ -124,5 +124,30 @@
     "darkMode": "Mode Sombre",
     "switchToLightMode": "Passer au mode clair",
     "switchToDarkMode": "Passer au mode sombre"
+  },
+  "validation": {
+    "pleaseCorrect": "Veuillez corriger les erreurs suivantes :",
+    "requiredField": "Ce champ est obligatoire",
+    "requiredFields": "* indique les champs obligatoires"
+  },
+  "register": {
+    "title": "Créer un Compte",
+    "subtitle": "Inscrivez-vous pour commencer à gérer vos listes de cadeaux",
+    "firstNameLabel": "Prénom",
+    "lastNameLabel": "Nom",
+    "emailLabel": "Adresse e-mail",
+    "passwordLabel": "Mot de passe",
+    "confirmPasswordLabel": "Confirmer le mot de passe",
+    "signUp": "S'inscrire",
+    "alreadyHaveAccount": "Vous avez déjà un compte ?",
+    "signIn": "Se connecter",
+    "registerSuccess": "Compte créé avec succès",
+    "registerError": "Une erreur est survenue lors de l'inscription",
+    "firstNameRequired": "Le prénom est requis",
+    "lastNameRequired": "Le nom est requis",
+    "emailRequired": "L'adresse e-mail est requise",
+    "passwordRequired": "Le mot de passe est requis",
+    "confirmPasswordRequired": "Veuillez confirmer votre mot de passe",
+    "passwordMismatch": "Les mots de passe ne correspondent pas"
   }
 }

@@ -195,7 +195,7 @@
         >
           <div class="flex items-center">
             <span v-if="$route.path.startsWith('/admin')" class="w-2 h-2 bg-indigo-500 rounded-full mr-2"></span>
-            Admin
+            {{ $t('navbar.admin') }}
           </div>
         </NuxtLink>
       </div>
@@ -219,26 +219,26 @@
             to="/profile" 
             class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700" 
           >
-            Your Profile
+            {{ $t('navbar.yourProfile') }}
           </NuxtLink>
           <a 
             href="#" 
             class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700" 
           >
-            Settings
+            {{ $t('navbar.settings') }}
           </a>
           <button 
             @click="themeStore.toggleTheme"
             class="w-full text-left block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700" 
           >
-            {{ themeStore.isDark ? 'Light Mode' : 'Dark Mode' }}
+            {{ themeStore.isDark ? $t('navbar.lightMode') : $t('navbar.darkMode') }}
           </button>
           <a 
             href="#" 
             @click.prevent="logout" 
             class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700" 
           >
-            Sign out
+            {{ $t('navbar.signOut') }}
           </a>
         </div>
       </div>

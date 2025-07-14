@@ -67,14 +67,28 @@
             <!-- Name section -->
             <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt class="text-sm font-medium text-gray-500">Full name</dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ user?.name }}</dd>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ user?.firstname }} {{user?.lastname}}</dd>
             </div>
+
 
             <!-- Email section -->
             <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt class="text-sm font-medium text-gray-500">Email address</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ user?.email }}</dd>
             </div>
+
+              <!-- Username section -->
+              <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <dt class="text-sm font-medium text-gray-500">Username</dt>
+                  <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ user?.username }}</dd>
+              </div>
+
+              <!-- Date de création -->
+              <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <dt class="text-sm font-medium text-gray-500">Compte créé le </dt>
+                  <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ new Date(user?.createdAt as string).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric'  })
+                      }}</dd>
+              </div>
           </dl>
         </div>
       </div>
@@ -127,6 +141,14 @@
                         placeholder="https://example.com/avatar.jpg"
                       />
                     </div>
+                      <div v-if="customAvatarUrl" class="mt-2">
+                          <p class="text-sm font-medium text-gray-700 mb-1">Profil Avatar Preview:</p>
+                          <div class="w-full flex justify-center">
+                              <img :src="customAvatarUrl" alt="Background preview"
+                                   class="h-[200px] w-[200px] object-cover border border-gray-200"
+                                   style="border-radius: 100%; border: 4px dimgrey solid" />
+                          </div>
+                      </div>
                   </div>
                 </div>
               </div>
@@ -202,11 +224,9 @@ onMounted(() => {
 
 // Get user initials for avatar placeholder
 const getUserInitials = () => {
-    if (!user?.value.firstname) return '?';
+    console.log('user.value:', user.value);
 
-    const firstNamePart = user.value.firstname.charAt(0).toUpperCase();
-    const lastNamePart = user.value.lastname.charAt(0).toUpperCase();
-    return firstNamePart + lastNamePart;
+    return 'sas';
 };
 
 // Select an avatar from the options

@@ -6,6 +6,23 @@
                 <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ t('login.subtitle') }}</p>
             </div>
 
+            <!-- Validation errors -->
+            <div v-if="formErrors.length > 0" class="mb-4 bg-red-50 border-l-4 border-red-400 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">{{ t('validation.pleaseCorrect') || 'Veuillez corriger les erreurs suivantes :' }}</h3>
+                        <ul class="mt-1 text-sm text-red-700 list-disc list-inside">
+                            <li v-for="(error, index) in formErrors" :key="index">{{ error }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
             <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
                 <div class="rounded-md shadow-sm -space-y-px">
                     <div>
@@ -17,7 +34,12 @@
                             autocomplete="username"
                             required
                             v-model="username"
-                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                            :class="[
+                                'appearance-none rounded-none relative block w-full px-3 py-2 border placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm',
+                                formErrors.some(e => e.includes('Email/Username') || e.includes('usernameRequired'))
+                                    ? 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500'
+                                    : 'border-gray-300'
+                            ]"
                             :placeholder="t('login.emailLabel')"
                         />
                     </div>
@@ -30,26 +52,18 @@
                             autocomplete="current-password"
                             required
                             v-model="password"
-                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                            :class="[
+                                'appearance-none rounded-none relative block w-full px-3 py-2 border placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm',
+                                formErrors.some(e => e.includes('Mot de passe') || e.includes('passwordRequired'))
+                                    ? 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500'
+                                    : 'border-gray-300'
+                            ]"
                             :placeholder="t('login.passwordLabel')"
                         />
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <input
-                            id="remember-me"
-                            name="remember-me"
-                            type="checkbox"
-                            v-model="rememberMe"
-                            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                        />
-                        <label for="remember-me" class="ml-2 block text-sm text-gray-900">
-                            {{ t('login.rememberMe') }}
-                        </label>
-                    </div>
-
+                <div class="flex items-center justify-end">
                     <div class="text-sm">
                         <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
                             {{ t('login.forgotPassword') }}
@@ -120,7 +134,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted} from 'vue';
+import {ref, onMounted, watch} from 'vue';
 import {useRouter} from 'vue-router';
 import {useUserStore} from '~/stores';
 import {useI18n} from 'vue-i18n';
@@ -128,9 +142,24 @@ import {useI18n} from 'vue-i18n';
 // Define reactive variables
 const username = ref('');
 const password = ref('');
-const rememberMe = ref(false);
 const loading = ref(false);
 const error = ref('');
+const formErrors = ref<string[]>([]);
+
+// Watch for changes in form fields to clear specific errors
+watch(() => username.value, (newValue) => {
+    if (newValue) {
+        formErrors.value = formErrors.value.filter(error => 
+            !error.includes('Email/Username') && !error.includes('usernameRequired'));
+    }
+});
+
+watch(() => password.value, (newValue) => {
+    if (newValue) {
+        formErrors.value = formErrors.value.filter(error => 
+            !error.includes('Mot de passe') && !error.includes('passwordRequired'));
+    }
+});
 
 // Get router, user store, and i18n
 const router = useRouter();
@@ -139,11 +168,28 @@ const {t} = useI18n();
 
 // Handle login form submission
 const handleLogin = async () => {
-    loading.value = true;
+    // Clear previous errors
     error.value = '';
+    formErrors.value = [];
+
+    // Validate required fields
+    if (!username.value) {
+        formErrors.value.push(t('login.usernameRequired') || 'Email/Username est requis');
+    }
+
+    if (!password.value) {
+        formErrors.value.push(t('login.passwordRequired') || 'Mot de passe est requis');
+    }
+
+    // If there are validation errors, don't proceed
+    if (formErrors.value.length > 0) {
+        return;
+    }
+
+    loading.value = true;
 
     try {
-        const success = await userStore.login(username.value, btoa(password.value), rememberMe.value);
+        const success = await userStore.login(username.value, btoa(password.value));
         if (success) {
             await router.push('/dashboard');
         } else {
@@ -179,24 +225,9 @@ const handleDemoLogin = async () => {
     }
 };
 
-// Handle registration
-const handleRegister = async () => {
-    loading.value = true;
-    error.value = '';
-
-    try {
-        const success = await userStore.register('Test', username.value, btoa(password.value));
-        if (success) {
-            await router.push('/dashboard');
-        } else {
-            error.value = t('login.invalidCredentials');
-        }
-    } catch (err) {
-        error.value = t('login.loginError');
-        console.error(err);
-    } finally {
-        loading.value = false;
-    }
+// Handle registration redirect
+const handleRegister = () => {
+    router.push('/register');
 };
 
 // Redirect to dashboard if already logged in

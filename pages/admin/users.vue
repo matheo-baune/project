@@ -114,7 +114,7 @@
                                     </div>
                                     <div class="ml-4">
                                         <div class="text-sm font-medium text-gray-900">
-                                            {{ user.name }}
+                                            {{ user.firstname + ' ' + user.lastname }}
                                         </div>
                                         <div class="text-sm text-gray-500">
                                             ID: {{ user.id }}

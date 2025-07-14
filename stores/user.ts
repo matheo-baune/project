@@ -30,7 +30,7 @@ export const useUserStore = defineStore('user', {
                 console.error('Failed to initialize user from localStorage:', error);
             }
         },
-        async login(username: string, password: string, rememberMe: boolean = false) {
+        async login(username: string, password: string) {
             this.loading = true;
             this.error = null;
             try {
@@ -49,20 +49,11 @@ export const useUserStore = defineStore('user', {
                     return false;
                 }
                 const data = await response.json();
-                this.currentUser = {
-                    id: data.id,
-                    name: data.name,
-                    email: data.username,
-                    avatar: data.avatar ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username)}&background=6366F1&color=fff`, // Default avatar
-                    isAdmin: data.is_admin ?? false,
-                };
+                this.currentUser = data as User;
                 this.isAuthenticated = true;
 
-                // If rememberMe is true, store the user data in localStorage
-                if (rememberMe) {
-                    localStorage.setItem('user', JSON.stringify(this.currentUser));
-                    localStorage.setItem('isAuthenticated', 'true');
-                }
+                localStorage.setItem('user', JSON.stringify(this.currentUser));
+                localStorage.setItem('isAuthenticated', 'true');
 
                 return true;
             } catch (error) {
@@ -90,33 +81,34 @@ export const useUserStore = defineStore('user', {
                 this.loading = false;
             }
         },
-        async register(name: string, username: string, password: string) {
+        async register(firstname: string, lastname: string, username: string, email: string, password: string, avatar?: string) {
             this.loading = true;
             this.error = null;
 
             try {
-
                 // Call the API to register user api/auth/register
                 const response = await fetch('/api/auth/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({name, username, password}),
+                    body: JSON.stringify({firstname, lastname, username, email, password, avatar}),
                 });
                 if (!response.ok) {
                     const errorData = await response.json();
-                    this.error = errorData.message ?? 'Registration failed';
+                    this.error = errorData.statusMessage ?? 'Registration failed';
                     this.loading = false;
                     return false;
                 }
                 const data = await response.json();
                 this.currentUser = {
                     id: data.id,
-                    name: data.name,
+                    firstname: data.firstname,
+                    lastname: data.lastname,
+                    username: data.username,
                     email: data.email,
-                    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=6366F1&color=fff`, // Default avatar
-                    isAdmin: false, // Default to false for regular users
+                    avatar: data.avatar ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username)}&background=6366F1&color=fff`, // Default avatar
+                    isAdmin: data.isAdmin ?? false, // Default to false for regular users
                 };
                 this.isAuthenticated = true;
 
@@ -154,8 +146,13 @@ export const useUserStore = defineStore('user', {
             this.error = null;
 
             try {
-                // Simulate API call
-                await new Promise(resolve => setTimeout(resolve, 800));
+                const response = await fetch(`/api/user/${this.currentUser?.id}/avatar`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({avatar: avatarUrl}),
+                });
 
                 if (this.currentUser) {
                     this.currentUser = {

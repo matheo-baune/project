@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const body = await readBody(event);
-    const { name, background, members } = body;
+    const { name, background, members, createdBy } = body;
 
     // Validate required fields
     if (!name) {
@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
 
         // Check if the user is the creator of the group
         const group = checkGroup.rows[0];
-        const userId = body.userId; // The ID of the user making the request
+        const userId = body.createdBy; // The ID of the user making the request
         
         if (group.created_by !== userId) {
             throw createError({ statusCode: 403, message: 'Only the group creator can update the group' });
@@ -69,7 +69,7 @@ export default defineEventHandler(async (event) => {
 
         // Fetch the updated members
         const membersQuery = `
-            SELECT u.id, u.name, u.username, u.avatar
+            SELECT u.id, u.firstname, u.lastname, u.username, u.avatar
             FROM users u
             JOIN group_members gm ON u.id = gm.user_id
             WHERE gm.group_id = $1
@@ -83,7 +83,7 @@ export default defineEventHandler(async (event) => {
             ...updatedGroup,
             members: updatedMembers
         };
-    } catch (error) {
+    } catch (error:any) {
         console.error('Error updating group:', error);
         throw createError({ 
             statusCode: error.statusCode || 500, 
