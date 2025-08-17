@@ -12,7 +12,8 @@
     "success": "Succès",
     "back": "Retour",
     "confirm": "Confirmer",
-    "actions": "Actions"
+    "actions": "Actions",
+    "yourName": "Votre nom"
   },
   "login": {
     "title": "Gestionnaire de Listes Cadeaux",
@@ -73,10 +74,15 @@
     "notReserved": "Non réservé",
     "reservedBy": "Réservé par",
     "reserve": "Réserver",
+    "reserveGift": "Réserver le Cadeau",
+    "reserveExplain": "Vous êtes sur le point de réserver \"{title}\". Veuillez entrer votre nom pour que les autres sachent qui l'a réservé.",
     "cancelReservation": "Annuler la réservation",
     "yourGifts": "Vos Cadeaux",
     "othersGifts": "Cadeaux des Autres",
     "allGifts": "Tous les Cadeaux",
+    "emptyTitle": "Pas encore de cadeaux",
+    "emptyDescriptionForEvent": "Allez sur la page d'édition pour ajouter des cadeaux à cet événement.",
+    "addGifts": "Ajouter des Cadeaux",
     "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce cadeau ?",
     "deleteSuccess": "Cadeau supprimé avec succès",
     "createSuccess": "Cadeau créé avec succès",
@@ -105,6 +111,9 @@
     "eventName": "Nom de l'Événement",
     "eventDate": "Date",
     "noEvents": "Aucun événement",
+    "shareList": "Partager la liste",
+    "editGifts": "Modifier les Cadeaux",
+    "linkCopied": "Lien public copié dans le presse-papiers !",
     "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet événement ?",
     "deleteSuccess": "Événement supprimé avec succès",
     "createSuccess": "Événement créé avec succès",
@@ -123,7 +132,8 @@
     "lightMode": "Mode Clair",
     "darkMode": "Mode Sombre",
     "switchToLightMode": "Passer au mode clair",
-    "switchToDarkMode": "Passer au mode sombre"
+    "switchToDarkMode": "Passer au mode sombre",
+    "home": "Accueil"
   },
   "validation": {
     "pleaseCorrect": "Veuillez corriger les erreurs suivantes :",
@@ -149,5 +159,17 @@
     "passwordRequired": "Le mot de passe est requis",
     "confirmPasswordRequired": "Veuillez confirmer votre mot de passe",
     "passwordMismatch": "Les mots de passe ne correspondent pas"
+  },
+  "public": {
+    "publicGiftList": "Liste publique des cadeaux",
+    "giftIdeas": "Idées de cadeaux",
+    "hint": "Sélectionnez un cadeau pour le réserver. Le créateur ne verra pas qui a réservé quoi.",
+    "noGifts": "Pas encore de cadeaux",
+    "noGiftsDescription": "Le créateur de l'événement n'a pas encore ajouté de cadeaux à cette liste."
+  },
+  "landing": {
+    "title": "Gestionnaire de Listes Cadeaux",
+    "subtitle": "Créez et partagez des listes de cadeaux avec vos amis et votre famille",
+    "getStarted": "Commencer"
   }
 }

@@ -1,22 +1,9 @@
 <template>
   <div>
-    <div class="bg-white shadow">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16 items-center">
-          <div class="flex-shrink-0 flex items-center">
-            <span class="text-xl font-bold text-indigo-600">Gift List Manager</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Loading state -->
-      <div v-if="loading" class="flex justify-center items-center py-12">
-        <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
+      <div v-if="loading" class="py-12 flex justify-center">
+        <UiLoader size="lg" color="text-indigo-600" :label="t('common.loading')" />
       </div>
       
       <!-- Error state -->
@@ -44,21 +31,21 @@
             {{ formattedDate }}
           </p>
           <div class="mt-4 inline-block bg-indigo-100 rounded-full px-4 py-2 text-sm font-medium text-indigo-800">
-            Public Gift List
+            {{ t('public.publicGiftList') }}
           </div>
         </div>
         
         <!-- Gifts section -->
         <div>
-          <h2 class="text-xl font-bold text-gray-900 mb-4 text-center">Gift Ideas</h2>
+          <h2 class="text-xl font-bold text-gray-900 mb-4 text-center">{{ t('public.giftIdeas') }}</h2>
           <p class="text-center text-gray-600 mb-8">
-            Select a gift to reserve it. The gift creator won't see who reserved which gift.
+            {{ t('public.hint') }}
           </p>
           
           <!-- Empty state -->
           <EmptyStateCard v-if="gifts.length === 0"
-                          title="No gifts yet"
-                          description="The event creator hasn't added any gifts to this list yet.">
+                          :title="t('public.noGifts')"
+                          :description="t('public.noGiftsDescription')">
             <template #icon>
               <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
@@ -89,25 +76,16 @@
       @reserve="confirmReserveGift"
     />
     
-    <!-- Toast Notification -->
-    <div 
-      v-if="showToast" 
-      class="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-      </svg>
-      {{ toastMessage }}
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router';
 import type { Event, Gift } from '~/types';
-import { useEventStore } from '~/stores/event';
-import { useGiftStore } from '~/stores/gift';
+import { useEventStore, useGiftStore, useNotificationStore } from '~/stores';
+import EmptyStateCard from "~/components/ui/EmptyStateCard.vue";
 
 const route = useRoute();
 
@@ -127,11 +105,11 @@ const gifts = ref<any[]>([]); // Using any to accommodate the isReserved propert
 const showReservationModal = ref(false);
 const selectedGift = ref<Gift | undefined>(undefined);
 
-// Toast state
-const showToast = ref(false);
-const toastMessage = ref('');
+// Notifications store
+const notificationStore = useNotificationStore();
 
 // Format the date for display
+const { locale, t } = useI18n()
 const formattedDate = computed(() => {
   if (!event.value?.date) return '';
   
@@ -220,12 +198,7 @@ const confirmReserveGift = async (giftId: string, name: string) => {
       showReservationModal.value = false;
       
       // Show success toast
-      showToast.value = true;
-      toastMessage.value = 'Gift reserved successfully! Thank you!';
-      
-      setTimeout(() => {
-        showToast.value = false;
-      }, 3000);
+      notificationStore.success('Gift reserved successfully! Thank you!')
     } else {
       error.value = giftStore.error || 'Failed to reserve gift';
     }

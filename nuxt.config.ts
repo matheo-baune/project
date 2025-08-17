@@ -10,14 +10,25 @@ export default defineNuxtConfig({
     }
   },
 
-  // Modules required for the gift list application
+  // Global CSS (Tailwind entry)
+  css: ['~/assets/css/tailwind.css'],
+
+  // PostCSS configuration for Tailwind (no Nuxt Tailwind module)
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {},
+    },
+  },
+
+  // Modules required for the gift list application (without @nuxtjs/tailwindcss)
   modules: [
-    '@nuxtjs/tailwindcss',
     '@nuxt/image',
     'nuxt-icon',
     '@nuxtjs/google-fonts',
     '@pinia/nuxt',
     '@nuxtjs/i18n',
+    '@nuxt/ui',
   ],
 
   // i18n configuration
@@ -25,7 +36,8 @@ export default defineNuxtConfig({
     locales: [
       { code: 'en', language: 'en-US', file: 'en.json', name: 'English' },
       { code: 'fr', language: 'fr-FR', file: 'fr.json', name: 'Français' },
-      { code: 'es', language: 'es-ES', file: 'es.json', name: 'Español' }
+      { code: 'es', language: 'es-ES', file: 'es.json', name: 'Español' },
+      { code: 'ja', language: 'ja-JP', file: 'ja.json', name: '日本語' }
     ],
     bundle: {
       optimizeTranslationDirective: false,

@@ -1,6 +1,5 @@
 <template>
-    <div>
-        <Navbar/>
+  <div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="flex justify-between items-center mb-6">
@@ -138,13 +137,13 @@
                                     @click="handleEditUser(user)"
                                     class="text-indigo-600 hover:text-indigo-900 mr-4"
                                 >
-                                    Edit
+                                    {{ t('common.edit') }}
                                 </button>
                                 <button
                                     @click="handleDeleteUser(user)"
                                     class="text-red-600 hover:text-red-900"
                                 >
-                                    Delete
+                                    {{ t('common.delete') }}
                                 </button>
                             </td>
                         </tr>
@@ -352,14 +351,14 @@
                                 <path class="opacity-75" fill="currentColor"
                                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            Delete
+                            {{ t('common.delete') }}
                         </button>
                         <button
                             type="button"
                             @click="showDeleteModal = false"
                             class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                         >
-                            Cancel
+                            {{ t('common.cancel') }}
                         </button>
                     </div>
                 </div>
@@ -372,10 +371,12 @@
 import {ref, onMounted} from 'vue';
 import {useRouter} from 'vue-router';
 import type {User} from '~/types';
-import {useUserStore} from '~/stores/user';
+import { useUserStore } from '~/stores';
+import { useI18n } from 'vue-i18n'
 
 const router = useRouter();
 const userStore = useUserStore();
+const { t } = useI18n()
 
 // State
 const loading = ref(true);

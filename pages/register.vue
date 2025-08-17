@@ -233,6 +233,8 @@
 </template>
 
 <script setup lang="ts">
+// Use minimal auth layout (no Navbar/Footer)
+definePageMeta({ layout: 'auth' })
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '~/stores';

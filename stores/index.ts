@@ -13,3 +13,5 @@ export {
     useGiftStore,
     useThemeStore
 };
+
+export { useNotificationStore } from './notification';

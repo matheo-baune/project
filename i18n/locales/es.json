@@ -12,7 +12,8 @@
     "success": "Éxito",
     "back": "Volver",
     "confirm": "Confirmar",
-    "actions": "Acciones"
+    "actions": "Acciones",
+    "yourName": "Tu nombre"
   },
   "login": {
     "title": "Gestor de Listas de Regalos",
@@ -75,10 +76,15 @@
     "notReserved": "No reservado",
     "reservedBy": "Reservado por",
     "reserve": "Reservar",
+    "reserveGift": "Reservar Regalo",
+    "reserveExplain": "Estás a punto de reservar \"{title}\". Por favor, introduce tu nombre para que otros sepan quién lo reservó.",
     "cancelReservation": "Cancelar Reserva",
     "yourGifts": "Tus Regalos",
     "othersGifts": "Regalos de Otros",
     "allGifts": "Todos los Regalos",
+    "emptyTitle": "Aún no hay regalos",
+    "emptyDescriptionForEvent": "Ve a la página de edición para añadir regalos a este evento.",
+    "addGifts": "Añadir Regalos",
     "confirmDelete": "¿Estás seguro de que quieres eliminar este regalo?",
     "deleteSuccess": "Regalo eliminado con éxito",
     "createSuccess": "Regalo creado con éxito",
@@ -107,6 +113,9 @@
     "eventName": "Nombre del Evento",
     "eventDate": "Fecha",
     "noEvents": "Sin eventos",
+    "shareList": "Compartir lista",
+    "editGifts": "Editar Regalos",
+    "linkCopied": "¡Enlace público copiado al portapapeles!",
     "confirmDelete": "¿Estás seguro de que quieres eliminar este evento?",
     "deleteSuccess": "Evento eliminado con éxito",
     "createSuccess": "Evento creado con éxito",
@@ -125,7 +134,8 @@
     "lightMode": "Modo Claro",
     "darkMode": "Modo Oscuro",
     "switchToLightMode": "Cambiar a modo claro",
-    "switchToDarkMode": "Cambiar a modo oscuro"
+    "switchToDarkMode": "Cambiar a modo oscuro",
+    "home": "Inicio"
   },
   "validation": {
     "pleaseCorrect": "Por favor, corrige los siguientes errores:",
@@ -151,5 +161,17 @@
     "passwordRequired": "La contraseña es obligatoria",
     "confirmPasswordRequired": "Por favor, confirma tu contraseña",
     "passwordMismatch": "Las contraseñas no coinciden"
+  },
+  "public": {
+    "publicGiftList": "Lista pública de regalos",
+    "giftIdeas": "Ideas de regalos",
+    "hint": "Selecciona un regalo para reservarlo. El creador no verá quién reservó qué.",
+    "noGifts": "Aún no hay regalos",
+    "noGiftsDescription": "El creador del evento aún no ha añadido regalos a esta lista."
+  },
+  "landing": {
+    "title": "Gestor de Listas de Regalos",
+    "subtitle": "Crea y comparte listas de regalos con tus amigos y familia",
+    "getStarted": "Empezar"
   }
 }

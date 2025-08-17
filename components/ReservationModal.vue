@@ -1,5 +1,5 @@
 <template>
-  <BaseModal :is-open="isOpen" :title="'Reserve Gift'" @close="$emit('close')">
+  <BaseModal :is-open="isOpen" :title="t('gifts.reserveGift')" @close="$emit('close')">
     <template #header>
       <div class="flex items-center gap-3">
         <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
@@ -7,17 +7,17 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
           </svg>
         </div>
-        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">Reserve Gift</h3>
+        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">{{ t('gifts.reserveGift') }}</h3>
       </div>
     </template>
 
     <div class="sm:text-left">
       <p class="text-sm text-gray-500 dark:text-gray-300">
-        You're about to reserve "{{ gift?.title }}". Please enter your name so others know who reserved this gift.
+        {{ t('gifts.reserveExplain', { title: gift?.title || '' }) }}
       </p>
       <div class="mt-4">
         <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Your Name *
+          {{ t('common.yourName') }} *
         </label>
         <div class="mt-1">
           <input
@@ -27,7 +27,7 @@
             v-model="name"
             required
             class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md dark:text-black"
-            placeholder="John Doe"
+            :placeholder="t('common.yourName')"
             ref="nameInput"
           />
         </div>
@@ -44,22 +44,20 @@
         @click="handleReserve"
       >
         <template #icon>
-          <svg v-if="loading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
+          <Icon v-if="loading" name="fa6-solid:spinner" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
         </template>
-        Reserve
+        {{ t('gifts.reserve') }}
       </UiButton>
-      <UiButton class="sm:ml-3 sm:mt-0 mt-3" variant="secondary" @click="$emit('close')">Cancel</UiButton>
+      <UiButton class="sm:ml-3 sm:mt-0 mt-3" variant="secondary" @click="$emit('close')">{{ t('common.cancel') }}</UiButton>
     </template>
   </BaseModal>
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { ref, onMounted, watch, nextTick } from 'vue';
 import type { Gift } from '~/types';
-import { useUserStore } from '~/stores/user';
+import { useUserStore } from '~/stores';
 import BaseModal from '~/components/ui/BaseModal.vue'
 import UiButton from '~/components/ui/UiButton.vue'
 
@@ -73,6 +71,7 @@ const emit = defineEmits<{
   (e: 'reserve', giftId: string, name: string): void;
 }>();
 
+const { t } = useI18n()
 const userStore = useUserStore();
 const name = ref('');
 const loading = ref(false);

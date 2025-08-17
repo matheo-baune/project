@@ -1,6 +1,5 @@
 <template>
-    <div>
-        <Navbar/>
+  <div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Loading state -->
@@ -345,7 +344,7 @@ import {ref, onMounted} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import type {Group, Event, User} from '~/types';
 import {useUserStore, useGroupStore, useEventStore} from '~/stores';
-import GroupModal from '~/components/GroupModal.vue';
+import GroupModal from '~/components/group/GroupModal.vue';
 
 const route = useRoute();
 const router = useRouter();

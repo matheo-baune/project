@@ -26,7 +26,7 @@
                 <button
                     v-for="locale in availableLocales"
                     :key="locale.code"
-                    @click="$switchLocalePath(locale.code); isOpen = false"
+                    @click="setLocale(locale.code); isOpen = false"
                     class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     role="menuitem"
                 >
@@ -39,17 +39,13 @@
 
 <script setup>
 import {ref, computed} from 'vue';
-
-const {locale, locales} = useI18n();
 const isOpen = ref(false);
 
-
-const switchLocalePath = useSwitchLocalePath()
-
+const { locale, locales, setLocale } = useI18n()
 
 const availableLocales = computed(() => {
-    return locales.value.filter(l => l.code !== locale.value);
-});
+    return locales.value.filter(i => i.code !== locale.value)
+})
 
 const currentLocale = computed(() => {
     return locales.value.find(l => l.code === locale.value);

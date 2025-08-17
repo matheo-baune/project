@@ -13,25 +13,27 @@
     "trustedDependencies": ["nuxt"]
   },
   "dependencies": {
-    "@nuxt/image": "^1.10.0",
+    "@nuxt/image": "^1.11.0",
+    "@nuxt/ui": "^2.22.1",
     "@nuxtjs/google-fonts": "^3.2.0",
     "@nuxtjs/i18n": "^9.5.6",
-    "@nuxtjs/tailwindcss": "^6.14.0",
-    "@pinia/nuxt": "^0.11.1",
-    "@types/pg": "^8.15.4",
+    "@pinia/nuxt": "^0.11.2",
+    "@types/pg": "^8.15.5",
     "dotenv": "^16.6.1",
-    "nuxt": "^3.17.6",
+    "nuxt": "^3.18.1",
     "nuxt-icon": "^0.6.10",
     "pg": "^8.16.3",
     "pinia": "^3.0.3",
-    "tailwindcss": "^3.4.17",
-    "typescript": "^5.8.3",
-    "vue": "^3.5.17",
+    "typescript": "^5.9.2",
+    "vue": "^3.5.18",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
     "@nuxt/types": "latest",
-    "@nuxt/typescript-build": "latest"
+    "@nuxt/typescript-build": "latest",
+    "tailwindcss": "^3.4.13",
+    "postcss": "^8.4.45",
+    "autoprefixer": "^10.4.20"
   }
 }

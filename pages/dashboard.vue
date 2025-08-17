@@ -1,10 +1,9 @@
 <template>
     <div class="min-h-screen dark:bg-gray-900 transition-colors duration-200">
-        <Navbar/>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 dark:text-white">
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">My Groups</h1>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ t('dashboard.myGroups') }}</h1>
                 <div class="flex items-center space-x-3">
                     <!-- Display mode selector -->
                     <div
@@ -13,7 +12,7 @@
                             @click="displayMode = 'card'"
                             class="p-1 rounded"
                             :class="displayMode === 'card' ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:bg-opacity-50 dark:text-indigo-300' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
-                            title="Card view"
+                            :title="t('dashboard.cardView')"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                                  stroke="currentColor">
@@ -25,7 +24,7 @@
                             @click="displayMode = 'large'"
                             class="p-1 rounded"
                             :class="displayMode === 'large' ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:bg-opacity-50 dark:text-indigo-300' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
-                            title="Large card view"
+                            :title="t('dashboard.largeCardView')"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                                  stroke="currentColor">
@@ -43,19 +42,14 @@
                              stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
-                        Create Group
+                        {{ t('dashboard.createGroup') }}
                     </button>
                 </div>
             </div>
 
             <!-- Loading state -->
-            <div v-if="loading" class="flex justify-center items-center py-12">
-                <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                     viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
+            <div v-if="loading" class="py-12">
+                <UiLoader size="lg" color="text-indigo-600" />
             </div>
 
             <!-- Error state -->
@@ -79,8 +73,8 @@
 
             <!-- Empty state -->
             <EmptyStateCard v-else-if="groups.length === 0"
-                            title="No groups yet"
-                            description="Get started by creating a new group for your family, friends, or colleagues.">
+                            :title="t('dashboard.noGroups')"
+                            :description="t('dashboard.noGroupsDescription')">
               <template #icon>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 dark:text-gray-300"
                      fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -181,14 +175,14 @@
                                 <path class="opacity-75" fill="currentColor"
                                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            Delete
+                            {{ t('common.delete') }}
                         </button>
                         <button
                             type="button"
                             @click="showDeleteModal = false"
                             class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                         >
-                            Cancel
+                            {{ t('common.cancel') }}
                         </button>
                     </div>
                 </div>
@@ -200,14 +194,19 @@
 <script setup lang="ts">
 import {onMounted, ref, watch} from 'vue';
 import {useRouter} from 'vue-router';
+import { useI18n } from 'vue-i18n'
 import type {Group, User} from '~/types';
-import {useUserStore, useGroupStore} from '~/stores';
-import GroupModal from '~/components/GroupModal.vue';
+import {useUserStore, useGroupStore, useNotificationStore} from '~/stores';
+import GroupModal from '~/components/group/GroupModal.vue';
 import EmptyStateCard from "~/components/ui/EmptyStateCard.vue";
+import UiLoader from "~/components/ui/UiLoader.vue";
+
+const { t } = useI18n()
 
 const router = useRouter();
 const userStore = useUserStore();
 const groupStore = useGroupStore();
+const notificationStore = useNotificationStore();
 
 // State
 const loading = ref(true);
@@ -296,8 +295,11 @@ const confirmDeleteGroup = async () => {
             // Remove the group from the local state
             groups.value = groups.value.filter(group => group.id !== currentGroupId.value);
             showDeleteModal.value = false;
+            // Toast success
+            notificationStore.success(t('groups.deleteSuccess'));
         } else {
             error.value = groupStore.error || 'Failed to delete group';
+            notificationStore.error(t('groups.errors.deleteFailed'));
         }
     } catch (err) {
         console.error('Failed to delete group:', err);
@@ -305,18 +307,6 @@ const confirmDeleteGroup = async () => {
     } finally {
         modalLoading.value = false;
     }
-};
-
-// Add a new member to the form
-const addMember = () => {
-    // TODO - Implement logic to add a new member
-    console.log('Adding new member');
-};
-
-// Remove a member from the form
-const removeMember = (id: string) => {
-    console.log('Removing member with index:', id);
-
 };
 
 // Handle group form submission
@@ -357,9 +347,12 @@ const handleSubmitGroup = async (payload?: { name: string; background?: string; 
                 if (index !== -1) {
                     groups.value[index] = updatedGroup;
                 }
+                // Toast success
+                notificationStore.success(t('groups.updateSuccess'));
                 closeModals();
             } else {
                 error.value = groupStore.error || 'Failed to update group';
+                notificationStore.error(t('groups.errors.updateFailed'));
             }
         } else {
             // Create new group
@@ -372,9 +365,12 @@ const handleSubmitGroup = async (payload?: { name: string; background?: string; 
             if (newGroup) {
                 // Refresh groups from the store instead of pushing to avoid duplication
                 groups.value = [...groupStore.groups];
+                // Toast success
+                notificationStore.success(t('groups.createSuccess'));
                 closeModals();
             } else {
                 error.value = groupStore.error || 'Failed to create group';
+                notificationStore.error(t('groups.errors.createFailed'));
             }
         }
     } catch (err) {
@@ -383,16 +379,6 @@ const handleSubmitGroup = async (payload?: { name: string; background?: string; 
     } finally {
         modalLoading.value = false;
     }
-};
-
-
-// Get member initials for avatar placeholder
-const getMemberInitials = (user: User) => {
-    if (!user?.firstname) return '?';
-
-    const firstNamePart = user.firstname.charAt(0).toUpperCase();
-    const lastNamePart = user.lastname.charAt(0).toUpperCase();
-    return firstNamePart + lastNamePart;
 };
 
 // Close all modals and reset form
