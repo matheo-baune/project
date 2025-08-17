@@ -1,4 +1,4 @@
-import db from "~/server/db";
+import {query} from "~/server/db";
 
 export default defineEventHandler(async (event) => {
 
@@ -10,13 +10,13 @@ export default defineEventHandler(async (event) => {
     }
     try {
         // Insert the new group into the database
-        const group = await db.query(
+        const group = await query(
             'INSERT INTO groups (name, background, created_by) VALUES ($1, $2, $3) RETURNING *',
             [name, background, createdBy]
         );
 
         // insert the creator into the group_members table
-        await db.query(
+        await query(
             'INSERT INTO group_members (user_id, group_id) VALUES ($1, $2)',
             [createdBy, group.rows[0].id]
         );
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
         // If members are provided, insert them into the group_members table
         if (members && members.length > 0) {
             for (const member of members) {
-                await db.query(`INSERT INTO group_members (user_id, group_id) VALUES ($1, $2)`, [member.id, group.rows[0].id]);
+                await query(`INSERT INTO group_members (user_id, group_id) VALUES ($1, $2)`, [member.id, group.rows[0].id]);
             }
         }
 

@@ -133,9 +133,16 @@ export const useGroupStore = defineStore('group', {
                 }
 
                 const newGroup = data as Group;
+                newGroup.members.push(userStore.currentUser as User);
+
+                if (!Array.isArray(this.groups)) {
+                    this.groups = []
+                }
+
                 this.groups.push(newGroup);
                 return newGroup;
             } catch (error) {
+                console.error('Error creating group:', error);
                 this.error = 'Failed to create group';
                 return null;
             } finally {

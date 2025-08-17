@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Gestionnaire de Listes Cadeaux",
+    "appName": "Incro",
     "loading": "Chargement...",
     "error": "Une erreur est survenue",
     "save": "Enregistrer",
@@ -111,7 +111,7 @@
     "updateSuccess": "Événement mis à jour avec succès"
   },
   "navbar": {
-    "appName": "Gestionnaire de Listes Cadeaux",
+    "appName": "Tomo",
     "dashboard": "Tableau de bord",
     "admin": "Administration",
     "openMenu": "Ouvrir le menu principal",

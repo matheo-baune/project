@@ -1,5 +1,5 @@
-import { defineStore } from 'pinia';
-import { ref, watch } from 'vue';
+import {defineStore} from 'pinia';
+import {ref, watch} from 'vue';
 
 export const useThemeStore = defineStore('theme', () => {
   // State
@@ -16,8 +16,7 @@ export const useThemeStore = defineStore('theme', () => {
         isDark.value = storedTheme === 'dark';
       } else if (process.client) {
         // Check system preference
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        isDark.value = prefersDark;
+        isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches;
       }
 
       // Apply theme

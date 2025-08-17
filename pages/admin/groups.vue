@@ -18,9 +18,7 @@
             @click="showCreateModal = true"
             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
+            <Icon name="heroicons-outline:plus" class="h-5 w-5 mr-2" />
             Add Group
           </button>
         </div>
@@ -44,10 +42,7 @@
 
       <!-- Loading state -->
       <div v-else-if="loading" class="flex justify-center items-center py-12">
-        <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
+        <Icon name="line-md:loading-twotone-loop" class="animate-spin h-8 w-8 text-indigo-600" />
       </div>
 
       <!-- Error state -->
@@ -135,129 +130,16 @@
     </div>
 
     <!-- Create/Edit Group Modal -->
-    <div v-if="showCreateModal || showEditModal" class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <!-- Background overlay -->
-        <div 
-          class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" 
-          aria-hidden="true"
-          @click="closeModals"
-        ></div>
-
-        <!-- Modal panel -->
-        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <div class="sm:flex sm:items-start">
-              <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                  {{ showEditModal ? 'Edit Group' : 'Create New Group' }}
-                </h3>
-                <div class="mt-4">
-                  <form @submit.prevent="handleSubmitGroup">
-                    <!-- Group Name -->
-                    <div>
-                      <label for="group-name" class="block text-sm font-medium text-gray-700">
-                        Group Name *
-                      </label>
-                      <div class="mt-1">
-                        <input 
-                          type="text" 
-                          name="group-name" 
-                          id="group-name" 
-                          v-model="groupForm.name"
-                          required
-                          class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" 
-                          placeholder="Family, Friends, Colleagues..."
-                        />
-                      </div>
-                    </div>
-
-                    <!-- Members -->
-                    <div class="mt-4">
-                      <label for="members" class="block text-sm font-medium text-gray-700">
-                        Members
-                      </label>
-                      <div class="mt-1">
-                        <div v-for="(member, index) in groupForm.members" :key="index" class="flex mb-2">
-                          <input 
-                            type="text" 
-                            v-model="member.name"
-                            placeholder="Name"
-                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-1/2 sm:text-sm border-gray-300 rounded-l-md" 
-                          />
-                          <input 
-                            type="email" 
-                            v-model="member.email"
-                            placeholder="Email"
-                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-1/2 sm:text-sm border-gray-300 border-l-0 rounded-r-md" 
-                          />
-                          <button 
-                            type="button" 
-                            @click="removeMember(index)"
-                            class="ml-2 inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-                        <button 
-                          type="button" 
-                          @click="addMember"
-                          class="mt-2 inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                          </svg>
-                          Add Member
-                        </button>
-                      </div>
-                      <p class="mt-1 text-xs text-gray-500">
-                        Add people who will be part of this group
-                      </p>
-                    </div>
-
-                    <!-- Modal actions -->
-                    <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
-                      <button 
-                        type="submit" 
-                        :disabled="modalLoading || !groupForm.name"
-                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
-                        :class="{ 'opacity-50 cursor-not-allowed': modalLoading || !groupForm.name }"
-                      >
-                        <svg 
-                          v-if="modalLoading" 
-                          class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          fill="none" 
-                          viewBox="0 0 24 24"
-                        >
-                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        {{ showEditModal ? 'Update Group' : 'Create Group' }}
-                      </button>
-                      <button 
-                        type="button" 
-                        @click="closeModals"
-                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <GroupModal
+      :model-value="showCreateModal || showEditModal"
+      :mode="showEditModal ? 'edit' : 'create'"
+      :loading="modalLoading"
+      :initial-group="groupForm"
+      :show-background="false"
+      @update:modelValue="(val) => { if (!val) closeModals() }"
+      @cancel="closeModals"
+      @submit="(payload) => handleSubmitGroup(payload)"
+    />
 
     <!-- View Members Modal -->
     <div v-if="showMembersModal" class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -387,6 +269,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import type { Group, User } from '~/types';
 import { useUserStore, useGroupStore } from '~/stores';
+import GroupModal from '~/components/GroupModal.vue';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -534,20 +417,21 @@ const removeMember = (index: number) => {
 };
 
 // Handle group form submission
-const handleSubmitGroup = async () => {
-  if (!groupForm.value.name) return;
+const handleSubmitGroup = async (payload?: { name: string; members: User[] }) => {
+  if (!payload?.name && !groupForm.value.name) return;
 
   modalLoading.value = true;
 
   try {
-    // Filter out empty members
-    const validMembers = groupForm.value.members.filter(member => member.name && member.email);
+    // Use payload from modal
+    const name = payload?.name ?? groupForm.value.name;
+    const validMembers = payload?.members ?? [];
 
     if (showEditModal.value) {
       // Update existing group
       const updatedGroup = await groupStore.updateGroup(
         currentGroupId.value,
-        groupForm.value.name,
+        name,
         validMembers
       );
 
@@ -560,20 +444,6 @@ const handleSubmitGroup = async () => {
         closeModals();
       } else {
         error.value = groupStore.error || 'Failed to update group';
-      }
-    } else {
-      // Create new group
-      const newGroup = await groupStore.createGroup(
-        groupForm.value.name,
-        validMembers
-      );
-
-      if (newGroup) {
-        // Refresh groups from the store
-        groups.value = [...groupStore.groups];
-        closeModals();
-      } else {
-        error.value = groupStore.error || 'Failed to create group';
       }
     }
   } catch (err) {

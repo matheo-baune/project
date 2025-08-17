@@ -1,4 +1,4 @@
-import db from "~/server/db";
+import {query} from '@/server/db';
 
 export default defineEventHandler(async (event) => {
     // Get the event ID from the URL
@@ -12,9 +12,9 @@ export default defineEventHandler(async (event) => {
     }
 
     // Get the user ID from the query parameters
-    const query = getQuery(event);
-    const userId = query.userId;
-    
+    const queryData = getQuery(event);
+    const userId = queryData.userId as string;
+
     if (!userId) {
         throw createError({ 
             statusCode: 400, 
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
 
     try {
         // Check if the event exists
-        const eventCheck = await db.query(
+        const eventCheck = await query(
             'SELECT * FROM events WHERE id = $1',
             [eventId]
         );
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
         const eventData = eventCheck.rows[0];
 
         // Check if the user is the creator of the event
-        if (eventData.created_by.toString() !== userId.toString()) {
+        if (eventData.createdBy.toString() !== userId.toString()) {
             throw createError({ 
                 statusCode: 403, 
                 message: 'Not authorized to delete this event' 
@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
         }
 
         // Delete the event
-        await db.query(
+        await query(
             'DELETE FROM events WHERE id = $1',
             [eventId]
         );

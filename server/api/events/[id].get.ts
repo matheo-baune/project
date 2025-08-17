@@ -1,4 +1,4 @@
-import db from "~/server/db";
+import { query } from '@/server/db';
 
 export default defineEventHandler(async (event) => {
     // Get the event ID from the URL
@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
         }
 
         // Get the event
-        const eventResult = await db.query(
+        const eventResult = await query(
             `SELECT e.*, g.id as group_id 
              FROM events e
              JOIN groups g ON e.group_id = g.id
@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
 
         // For non-public view, check if the user is a member of the group
         if (!isPublic) {
-            const memberCheck = await db.query(
+            const memberCheck = await query(
                 `SELECT * FROM group_members 
                  WHERE group_id = $1 AND user_id = $2`,
                 [eventData.group_id, userId]
