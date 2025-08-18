@@ -9,7 +9,7 @@
           <!-- Name -->
           <div>
             <label for="name" class="block text-sm font-medium text-gray-700">
-              Event Namee *
+              Event Name *
             </label>
             <div class="mt-1">
               <input 
