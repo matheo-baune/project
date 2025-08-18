@@ -159,7 +159,6 @@ interface EventLike {
     name: string
     date: string
     background?: string
-    scope?: 'single' | 'multiple'
     targetPersonId?: string
 }
 
@@ -187,7 +186,7 @@ const emit = defineEmits<{
     (e: 'cancel'): void
 }>()
 
-const {t} = useI18n()
+const { t } = useI18n()
 
 const mode = computed(() => props.mode ?? 'create')
 const loading = computed(() => props.loading)
@@ -208,7 +207,6 @@ const localForm = reactive<EventLike>({
     date: props.initialEvent?.date ? normalizeDate(props.initialEvent.date) : today(),
 
     background: props.initialEvent?.background || '',
-    scope: props.initialEvent?.scope || 'multiple',
     targetPersonId: props.initialEvent?.targetPersonId
 })
 
@@ -228,15 +226,11 @@ const membersComboboxWithDisabled = computed<SelectMenuItem[]>(() =>
 watch(allTargets, (val) => {
     if (val) {
         // Everyone is a target: no single target person
-        localForm.scope = 'multiple'
         targetSelected.value = null
         localForm.targetPersonId = undefined
     }
 })
 
-watch(() => props.members, (val) => {
-    console.log("cc",val)
-})
 const allMembersItems = computed(() => membersCombobox.value)
 function toggleSelectAll() {
     if (selectAll.value) {
@@ -262,12 +256,11 @@ watch(() => props.modelValue, (open) => {
         localForm.name = props.initialEvent?.name || ''
         localForm.date = props.initialEvent?.date ? normalizeDate(props.initialEvent.date) : today()
         localForm.background = props.initialEvent?.background || ''
-        localForm.scope = props.initialEvent?.scope || 'multiple'
         localForm.targetPersonId = props.initialEvent?.targetPersonId
         // reset selections on open
         selectAll.value = false
         // derive allTargets from initial form data
-        allTargets.value = !localForm.targetPersonId && (localForm.scope === 'multiple')
+        allTargets.value = !localForm.targetPersonId
         // set targetSelected from form
         targetSelected.value = membersCombobox.value.find(i => i.value === localForm.targetPersonId) || null
         // initialize participants keeping target if any
@@ -281,10 +274,9 @@ watch(() => props.initialEvent, (val) => {
         localForm.name = val?.name || ''
         localForm.date = val?.date ? normalizeDate(val.date) : today()
         localForm.background = val?.background || ''
-        localForm.scope = val?.scope || 'multiple'
         localForm.targetPersonId = val?.targetPersonId
         // sync allTargets and target selection
-        allTargets.value = !localForm.targetPersonId && (localForm.scope === 'multiple')
+        allTargets.value = !localForm.targetPersonId
         targetSelected.value = membersCombobox.value.find(i => i.value === localForm.targetPersonId) || null
         // make sure target is included in participants
         ensureTargetInParticipants()

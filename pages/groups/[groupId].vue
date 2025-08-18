@@ -1,17 +1,17 @@
 <template>
-  <div>
+    <div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Loading state -->
             <div v-if="loading" class="flex justify-center items-center py-12">
-                <Icon name="line-md:loading-twotone-loop" class="animate-spin h-8 w-8 text-indigo-600" />
+                <Icon name="line-md:loading-twotone-loop" class="animate-spin h-8 w-8 text-indigo-600"/>
             </div>
 
             <!-- Error state -->
             <div v-else-if="error" class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
                 <div class="flex">
                     <div class="shrink-0">
-                        <Icon name="heroicons-solid:x-circle" class="h-5 w-5 text-red-400" aria-hidden="true" />
+                        <Icon name="heroicons-solid:x-circle" class="h-5 w-5 text-red-400" aria-hidden="true"/>
                     </div>
                     <div class="ml-3">
                         <p class="text-sm text-red-700">
@@ -32,7 +32,7 @@
                 <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
                     <div class="flex items-center">
                         <NuxtLink to="/dashboard" class="text-gray-400 hover:text-gray-600 mr-2">
-                            <Icon name="heroicons-outline:arrow-left" class="h-4 w-4" />
+                            <Icon name="heroicons-outline:arrow-left" class="h-4 w-4"/>
                         </NuxtLink>
                         <h1 class="text-xl font-medium text-gray-900 dark:text-white">{{ group?.name }}</h1>
                         <span class="ml-2 text-xs text-gray-500">{{ group?.members.length }} members</span>
@@ -59,7 +59,7 @@
                     <div class="w-full md:w-1/4 lg:w-1/5">
                         <div class="bg-white shadow-sm sm:rounded-lg sticky top-4">
                             <div class="px-3 py-3 border-b border-gray-200">
-                                <h3 class="text-sm font-medium text-gray-900">({{group?.members.length}}) Members</h3>
+                                <h3 class="text-sm font-medium text-gray-900">({{ group?.members.length }}) Members</h3>
                             </div>
                             <ul class="divide-y divide-gray-100">
                                 <li v-for="member in group?.members" :key="member.id" class="px-3 py-2">
@@ -68,7 +68,7 @@
                                             <div
                                                 class="h-7 w-7 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-800 font-semibold text-xs select-none">
                                                 <img v-if="member?.avatar" :src="member.avatar" alt="User avatar"
-                                                     class="h-full w-full object-cover rounded-full" />
+                                                     class="h-full w-full object-cover rounded-full"/>
                                                 <span v-else>{{ getMemberInitials(member) }}</span>
                                             </div>
                                             <div class="ml-2 truncate">
@@ -88,7 +88,7 @@
                                                 title="Remove member"
                                                 @click="removeMemberInline(member.id)"
                                             >
-                                                <Icon name="heroicons-outline:x-mark" class="h-4 w-4" />
+                                                <Icon name="heroicons-outline:x-mark" class="h-4 w-4"/>
                                             </button>
                                         </div>
                                     </div>
@@ -104,14 +104,14 @@
 
                             <!-- Display mode selector -->
                             <div v-if="events.length > 0"
-                                class="flex items-center space-x-2 bg-white rounded-lg shadow-xs p-1 border border-gray-100">
+                                 class="flex items-center space-x-2 bg-white rounded-lg shadow-xs p-1 border border-gray-100">
                                 <button
                                     @click="displayMode = 'small'"
                                     class="p-1 rounded-sm"
                                     :class="displayMode === 'small' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'"
                                     title="Small grid view"
                                 >
-                                    <Icon name="heroicons-outline:view-grid" class="h-4 w-4" />
+                                    <Icon name="heroicons-outline:view-grid" class="h-4 w-4"/>
                                 </button>
                                 <button
                                     @click="displayMode = 'card'"
@@ -119,7 +119,7 @@
                                     :class="displayMode === 'card' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'"
                                     title="Card view"
                                 >
-                                    <Icon name="heroicons-outline:rectangle-stack" class="h-4 w-4" />
+                                    <Icon name="heroicons-outline:rectangle-stack" class="h-4 w-4"/>
                                 </button>
                                 <button
                                     @click="displayMode = 'large'"
@@ -127,7 +127,7 @@
                                     :class="displayMode === 'large' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'"
                                     title="Large card view"
                                 >
-                                    <Icon name="heroicons-outline:view-columns" class="h-4 w-4" />
+                                    <Icon name="heroicons-outline:view-columns" class="h-4 w-4"/>
                                 </button>
                             </div>
                         </div>
@@ -135,7 +135,7 @@
                         <!-- Empty state -->
                         <div v-if="events.length === 0"
                              class="bg-white border border-gray-100 rounded-lg p-4 text-center">
-                            <Icon name="heroicons-outline:calendar" class="h-8 w-8 mx-auto text-gray-400" />
+                            <Icon name="heroicons-outline:calendar" class="h-8 w-8 mx-auto text-gray-400"/>
                             <h3 class="mt-2 text-sm font-medium text-gray-900">No events yet</h3>
                             <button
                                 @click="showCreateEventModal = true"
@@ -170,13 +170,13 @@
 
         <!-- Create/Edit Event Modal -->
         <EventModal
-          :model-value="showCreateEventModal"
-          mode="create"
-          :loading="modalLoading"
-          :members="group?.members"
-          @update:modelValue="(val) => { if (!val) closeModals() }"
-          @cancel="closeModals"
-          @submit="handleSubmitEvent"
+            :model-value="showCreateEventModal"
+            mode="create"
+            :loading="modalLoading"
+            :members="group?.members"
+            @update:modelValue="(val) => { if (!val) closeModals() }"
+            @cancel="closeModals"
+            @submit="handleSubmitEvent"
         />
 
         <!-- Edit Group Modal -->
@@ -194,31 +194,35 @@
 
         <!-- Delete Confirmation Modal -->
         <BaseModal :is-open="showDeleteModal" :title="'Delete Event'" @close="showDeleteModal = false">
-          <template #header>
-            <div class="flex items-center gap-3">
-              <div class="mx-auto sm:mx-0 shrink-0 flex items-center justify-center h-10 w-10 rounded-full bg-red-100">
-                <Icon name="heroicons-outline:exclamation-triangle" class="h-6 w-6 text-red-600" aria-hidden="true" />
-              </div>
-              <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">Delete Event</h3>
-            </div>
-          </template>
+            <template #header>
+                <div class="flex items-center gap-3">
+                    <div
+                        class="mx-auto sm:mx-0 shrink-0 flex items-center justify-center h-10 w-10 rounded-full bg-red-100">
+                        <Icon name="heroicons-outline:exclamation-triangle" class="h-6 w-6 text-red-600"
+                              aria-hidden="true"/>
+                    </div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">Delete Event</h3>
+                </div>
+            </template>
 
-          <p class="text-sm text-gray-600 dark:text-gray-300">
-            Are you sure you want to delete this event? All gifts associated with this event will be permanently removed. This action cannot be undone.
-          </p>
+            <p class="text-sm text-gray-600 dark:text-gray-300">
+                Are you sure you want to delete this event? All gifts associated with this event will be permanently
+                removed. This action cannot be undone.
+            </p>
 
-          <template #footer>
-            <UiButton variant="primary" class="bg-red-600 hover:bg-red-700 focus:ring-red-500 mx-2"
-                      :disabled="modalLoading" @click="confirmDeleteEvent">
-              <template #icon>
-                <Icon v-if="modalLoading" name="line-md:loading-twotone-loop" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
-              </template>
-              Delete
-            </UiButton>
-            <UiButton class="sm:ml-3 sm:mt-0 mt-3" variant="secondary" @click="showDeleteModal = false">
-              Cancel
-            </UiButton>
-          </template>
+            <template #footer>
+                <UiButton variant="primary" class="bg-red-600 hover:bg-red-700 focus:ring-red-500 mx-2"
+                          :disabled="modalLoading" @click="confirmDeleteEvent">
+                    <template #icon>
+                        <Icon v-if="modalLoading" name="line-md:loading-twotone-loop"
+                              class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"/>
+                    </template>
+                    Delete
+                </UiButton>
+                <UiButton class="sm:ml-3 sm:mt-0 mt-3" variant="secondary" @click="showDeleteModal = false">
+                    Cancel
+                </UiButton>
+            </template>
         </BaseModal>
     </div>
 </template>
@@ -460,7 +464,14 @@ const handleSubmitGroup = async (payload?: { name: string; background?: string; 
 };
 
 // Handle event form submission
-const handleSubmitEvent = async (payload?: { id?: string; name: string; date: string; background?: string; scope?: 'single' | 'multiple'; targetPersonId?: string }) => {
+const handleSubmitEvent = async (payload?: {
+    id?: string;
+    name: string;
+    date: string;
+    background?: string;
+    scope?: 'single' | 'multiple';
+    targetPersonId?: string
+}) => {
     const hasPayload = !!payload && !!payload.name && !!payload.date
     const hasForm = !!eventForm.value.name && !!eventForm.value.date
     if (!hasPayload && !hasForm) return;
