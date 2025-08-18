@@ -283,6 +283,7 @@ const backgroundStyle = computed(() => {
     const eventNameLower = props.event.name.toLowerCase();
     let backgroundImage = backgroundImages.default;
 
+    //TODO - Voir pour une gestion par défaut meilleur
     if (eventNameLower.includes('birthday')) {
         backgroundImage = backgroundImages.birthday;
     } else if (eventNameLower.includes('christmas')) {
@@ -290,6 +291,11 @@ const backgroundStyle = computed(() => {
     } else if (eventNameLower.includes('wedding')) {
         backgroundImage = backgroundImages.wedding;
     }
+
+    if (props.event.background){
+        backgroundImage = props.event.background;
+    }
+
 
     // Add a dark overlay to ensure text is readable
     return {

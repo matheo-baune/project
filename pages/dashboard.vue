@@ -143,7 +143,7 @@
               </template>
               {{ t('common.delete') }}
             </UiButton>
-            <UiButton class="sm:ml-3 sm:mt-0 mt-3" variant="secondary" @click="showDeleteModal = false">
+            <UiButton class="sm:ml-3 sm:mt-0 mt-3 mx-2" variant="secondary" @click="showDeleteModal = false">
               {{ t('common.cancel') }}
             </UiButton>
           </template>

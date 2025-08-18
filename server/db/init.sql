@@ -47,6 +47,8 @@ CREATE TABLE IF NOT EXISTS events
     id              SERIAL PRIMARY KEY,
     name            VARCHAR(255) NOT NULL,
     date            DATE         NOT NULL,
+    background      VARCHAR(1024),
+    description     text,
     group_id        INTEGER      NOT NULL REFERENCES groups (id) ON DELETE CASCADE,
     created_by      INTEGER      NOT NULL REFERENCES users (id) ON DELETE CASCADE,
     created_at      TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP

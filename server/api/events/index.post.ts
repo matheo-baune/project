@@ -38,25 +38,6 @@ export default defineEventHandler(async (event) => {
 
         const created = result.rows[0];
 
-        // Ensure event_settings table exists
-        await db.query(
-            `CREATE TABLE IF NOT EXISTS event_settings (
-               event_id BIGINT PRIMARY KEY,
-               scope VARCHAR(16) DEFAULT 'multiple',
-               target_person_id BIGINT NULL
-             )`
-        );
-
-        // Upsert settings if provided
-        if (scope || targetPersonId) {
-            await db.query(
-              `INSERT INTO event_settings (event_id, scope, target_person_id)
-               VALUES ($1, $2, $3)
-               ON CONFLICT (event_id) DO UPDATE SET scope = EXCLUDED.scope, target_person_id = EXCLUDED.target_person_id`,
-              [created.id, scope || 'multiple', targetPersonId || null]
-            );
-        }
-
         // Format the response
         return {
             id: created.id.toString(),
@@ -64,8 +45,6 @@ export default defineEventHandler(async (event) => {
             date: created.date,
             groupId: created.group_id.toString(),
             createdBy: created.created_by.toString(),
-            scope: scope || 'multiple',
-            targetPersonId: targetPersonId ? targetPersonId.toString() : undefined
         };
     } catch (error) {
         console.error('Error creating event:', error);

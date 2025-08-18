@@ -1,6 +1,6 @@
 <template>
   <Teleport to="body">
-    <div v-if="model" class="fixed z-50 inset-0 overflow-y-auto" role="dialog" aria-modal="true">
+    <div v-if="model" class="fixed inset-0 overflow-y-auto" role="dialog" aria-modal="true">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <!-- Overlay -->
         <transition name="fade" appear>

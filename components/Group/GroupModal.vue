@@ -115,7 +115,7 @@
         </template>
         {{ submitLabel || (mode === 'edit' ? t('groups.editGroup') : t('groups.createGroup')) }}
       </UiButton>
-      <UiButton class="sm:ml-3 sm:mt-0 mt-3" variant="secondary" type="button" @click="onCancel">
+      <UiButton class="sm:ml-3 sm:mt-0 mt-3 mx-2" variant="secondary" type="button" @click="onCancel">
         {{ t('common.cancel') }}
       </UiButton>
     </template>

@@ -39,23 +39,25 @@ export default defineEventHandler(async (event) => {
 
         // Get all events for the group
         const result = await db.query(
-            `SELECT * FROM events 
+            `SELECT * FROM events
+             INNER JOIN event_members em ON id = em.event_id
              WHERE group_id = $1 
              ORDER BY date ASC`,
             [groupId]
         );
 
         // Format the response
-        const events = result.rows.map(event => ({
+        return result.rows.map(event => ({
             id: event.id.toString(),
             name: event.name,
             date: event.date,
+            background: event.background,
+            description: event.description,
             groupId: event.group_id.toString(),
-            createdBy: event.created_by.toString()
+            createdBy: event.created_by.toString(),
+            members: event.members,
         }));
-
-        return events;
-    } catch (error) {
+    } catch (error : any) {
         console.error('Error fetching events for group:', error);
         if (error.statusCode) {
             throw error; // Re-throw validation errors

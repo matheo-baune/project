@@ -103,7 +103,7 @@
                             <h2 class="text-lg font-medium text-gray-900 dark:text-white">Events</h2>
 
                             <!-- Display mode selector -->
-                            <div
+                            <div v-if="events.length > 0"
                                 class="flex items-center space-x-2 bg-white rounded-lg shadow-xs p-1 border border-gray-100">
                                 <button
                                     @click="displayMode = 'small'"
@@ -173,7 +173,7 @@
           :model-value="showCreateEventModal"
           mode="create"
           :loading="modalLoading"
-          :members="group?.members || []"
+          :members="group?.members"
           @update:modelValue="(val) => { if (!val) closeModals() }"
           @cancel="closeModals"
           @submit="handleSubmitEvent"
@@ -208,7 +208,7 @@
           </p>
 
           <template #footer>
-            <UiButton variant="primary" class="bg-red-600 hover:bg-red-700 focus:ring-red-500"
+            <UiButton variant="primary" class="bg-red-600 hover:bg-red-700 focus:ring-red-500 mx-2"
                       :disabled="modalLoading" @click="confirmDeleteEvent">
               <template #icon>
                 <Icon v-if="modalLoading" name="line-md:loading-twotone-loop" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
@@ -246,7 +246,7 @@ const groupId = route.params.groupId as string;
 // State
 const loading = ref(true);
 const error = ref('');
-const group = ref<Group | null>(null);
+const group = ref<Group>(null);
 const events = ref<Event[]>([]);
 const currentUser = ref(userStore.currentUser);
 const displayMode = ref<'card' | 'list' | 'small' | 'large'>('card');
@@ -257,9 +257,6 @@ const showEditGroupModal = ref(false);
 const showDeleteModal = ref(false);
 const modalLoading = ref(false);
 const currentEventId = ref('');
-
-// Inline invite by email form state
-const inviteEmails = ref('');
 
 // Forms
 const groupForm = ref({
@@ -328,7 +325,7 @@ const fetchEvents = async () => {
 
     try {
         const fetchedEvents = await eventStore.fetchEventsByGroupId(groupId);
-        events.value = fetchedEvents;
+        events.value = fetchedEvents as Event[];
     } catch (err) {
         console.error('Failed to fetch events:', err);
         error.value = 'Failed to load events. Please try again.';

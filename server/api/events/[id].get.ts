@@ -26,20 +26,11 @@ export default defineEventHandler(async (event) => {
         }
 
         // Get the event
-        // Ensure event_settings table exists (safe no-op if already exists)
-        await query(
-          `CREATE TABLE IF NOT EXISTS event_settings (
-             event_id BIGINT PRIMARY KEY,
-             scope VARCHAR(16) DEFAULT 'multiple',
-             target_person_id BIGINT NULL
-           )`
-        );
 
         const eventResult = await query(
-            `SELECT e.*, g.id as group_id, es.scope, es.target_person_id 
+            `SELECT e.*, g.id as group_id
              FROM events e
              JOIN groups g ON e.group_id = g.id
-             LEFT JOIN event_settings es ON es.event_id = e.id
              WHERE e.id = $1`,
             [eventId]
         );
