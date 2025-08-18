@@ -1,11 +1,11 @@
 <template>
-  <nav class="bg-white shadow dark:bg-gray-800 dark:text-white transition-colors duration-200">
+  <nav class="bg-white shadow-sm dark:bg-gray-800 dark:text-white transition-colors duration-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16">
         <div class="flex">
-          <div class="flex-shrink-0 flex items-center">
+          <div class="shrink-0 flex items-center">
             <NuxtLink to="/dashboard" class="text-xl font-bold text-indigo-600 dark:text-indigo-400">
-              {{ $t('navbar.appName') }}
+              {{ t('navbar.appName') }}
             </NuxtLink>
           </div>
           <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
@@ -17,7 +17,7 @@
             >
               <span class="flex items-center">
                 <span v-if="$route.path === '/dashboard'" class="w-2 h-2 bg-indigo-500 rounded-full mr-2"></span>
-                {{ $t('navbar.dashboard') }}
+                {{ t('navbar.dashboard') }}
               </span>
             </NuxtLink>
             <NuxtLink
@@ -28,7 +28,7 @@
             >
               <span class="flex items-center">
                 <span v-if="$route.path.startsWith('/admin')" class="w-2 h-2 bg-indigo-500 rounded-full mr-2"></span>
-                {{ $t('navbar.admin') }}
+                {{ t('navbar.admin') }}
               </span>
             </NuxtLink>
           </div>
@@ -37,8 +37,8 @@
           <!-- Theme toggle -->
           <button
             @click="themeStore.toggleTheme"
-            class="p-1 rounded-full text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:text-gray-300 dark:hover:text-white"
-            :title="themeStore.isDark ? $t('navbar.switchToLightMode') : $t('navbar.switchToDarkMode')"
+            class="p-1 rounded-full text-gray-500 hover:text-gray-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:text-gray-300 dark:hover:text-white"
+            :title="themeStore.isDark ? t('navbar.switchToLightMode') : t('navbar.switchToDarkMode')"
           >
             <!-- Sun icon for dark mode -->
             <svg
@@ -75,12 +75,12 @@
               <button
                 @click="isProfileMenuOpen = !isProfileMenuOpen"
                 type="button"
-                class="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                class="bg-white rounded-full flex text-sm focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 id="user-menu-button"
                 aria-expanded="false"
                 aria-haspopup="true"
               >
-                <span class="sr-only">{{ $t('navbar.openUserMenu') }}</span>
+                <span class="sr-only">{{ t('navbar.openUserMenu') }}</span>
                 <div class="h-8 w-8 rounded-full overflow-hidden">
                   <img v-if="user?.avatar" :src="user.avatar" alt="User avatar" class="h-full w-full object-cover" />
                   <div v-else class="h-full w-full bg-indigo-100 flex items-center justify-center text-indigo-800 font-semibold">
@@ -93,14 +93,14 @@
             <!-- Dropdown menu -->
             <div
               v-if="isProfileMenuOpen"
-              class="origin-top-right z-10 absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+              class="origin-top-right z-10 absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-hidden"
               role="menu"
               aria-orientation="vertical"
               aria-labelledby="user-menu-button"
               tabindex="-1"
             >
               <div class="px-4 py-2 text-xs text-gray-500">
-                {{ $t('navbar.signedInAs') }} <span class="font-medium">{{ user?.email }}</span>
+                {{ t('navbar.signedInAs') }} <span class="font-medium">{{ user?.email }}</span>
               </div>
               <div class="border-t border-gray-100"></div>
               <NuxtLink
@@ -110,7 +110,7 @@
                 tabindex="-1"
                 id="user-menu-item-0"
               >
-                {{ $t('navbar.yourProfile') }}
+                {{ t('navbar.yourProfile') }}
               </NuxtLink>
               <a
                 href="#"
@@ -119,7 +119,7 @@
                 tabindex="-1"
                 id="user-menu-item-1"
               >
-                {{ $t('navbar.settings') }}
+                {{ t('navbar.settings') }}
               </a>
               <a
                 href="#"
@@ -129,7 +129,7 @@
                 tabindex="-1"
                 id="user-menu-item-2"
               >
-                {{ $t('navbar.signOut') }}
+                {{ t('navbar.signOut') }}
               </a>
             </div>
           </div>
@@ -148,7 +148,7 @@
         >
           <div class="flex items-center">
             <span v-if="$route.path === '/dashboard'" class="w-2 h-2 bg-indigo-500 rounded-full mr-2"></span>
-            {{ $t('navbar.dashboard') }}
+            {{ t('navbar.dashboard') }}
           </div>
         </NuxtLink>
         <NuxtLink
@@ -159,13 +159,13 @@
         >
           <div class="flex items-center">
             <span v-if="$route.path.startsWith('/admin')" class="w-2 h-2 bg-indigo-500 rounded-full mr-2"></span>
-            {{ $t('navbar.admin') }}
+            {{ t('navbar.admin') }}
           </div>
         </NuxtLink>
       </div>
       <div class="pt-4 pb-3 border-t border-gray-200">
         <div class="flex items-center px-4">
-          <div class="flex-shrink-0">
+          <div class="shrink-0">
             <div class="h-10 w-10 rounded-full overflow-hidden">
               <img v-if="user?.avatar" :src="user.avatar" alt="User avatar" class="h-full w-full object-cover" />
               <div v-else class="h-full w-full bg-indigo-100 flex items-center justify-center text-indigo-800 font-semibold">
@@ -183,26 +183,26 @@
             to="/profile"
             class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700"
           >
-            {{ $t('navbar.yourProfile') }}
+            {{ t('navbar.yourProfile') }}
           </NuxtLink>
           <a
             href="#"
             class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700"
           >
-            {{ $t('navbar.settings') }}
+            {{ t('navbar.settings') }}
           </a>
           <button
             @click="themeStore.toggleTheme"
             class="w-full text-left block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700"
           >
-            {{ themeStore.isDark ? $t('navbar.lightMode') : $t('navbar.darkMode') }}
+            {{ themeStore.isDark ? t('navbar.lightMode') : t('navbar.darkMode') }}
           </button>
           <a
             href="#"
             @click.prevent="logout"
             class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700"
           >
-            {{ $t('navbar.signOut') }}
+            {{ t('navbar.signOut') }}
           </a>
         </div>
       </div>

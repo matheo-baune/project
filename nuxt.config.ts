@@ -16,7 +16,7 @@ export default defineNuxtConfig({
   // PostCSS configuration for Tailwind (no Nuxt Tailwind module)
   postcss: {
     plugins: {
-      tailwindcss: {},
+      '@tailwindcss/postcss': {},
       autoprefixer: {},
     },
   },
@@ -72,6 +72,9 @@ export default defineNuxtConfig({
   app: {
     head: {
       title: 'Gift List Manager',
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: 'https://nuxt.com/assets/design-kit/icon-white.png' },
+      ],
       meta: [
         { name: 'description', content: 'A gift list management application for groups' }
       ],

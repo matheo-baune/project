@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
 
         // Query to fetch the group members
         const membersQuery = `
-            SELECT u.id, u.lastname, u.firstname, u.email, u.username
+            SELECT u.id, u.lastname, u.firstname, u.email, u.username, u.avatar
             FROM users u
             JOIN group_members gm ON u.id = gm.user_id
             WHERE gm.group_id = $1

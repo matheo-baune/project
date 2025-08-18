@@ -10,7 +10,7 @@
             <!-- Error state -->
             <div v-else-if="error" class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
                 <div class="flex">
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                         <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                              fill="currentColor" aria-hidden="true">
                             <path fill-rule="evenodd"
@@ -67,28 +67,27 @@
                             </template>
                             {{ t('events.editEvent') }}
                         </UiButton>
-                        <UiButton :to="`/events/${eventId}/edit`" variant="primary">
-                            <template #icon>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
-                                     viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                                </svg>
-                            </template>
-                            {{ t('events.editGifts') }}
-                        </UiButton>
                     </div>
                 </div>
 
                 <!-- Gifts section -->
                 <div>
-                    <h2 class="text-xl font-bold text-gray-900 mb-4 dark:text-white">{{ t('gifts.title') }}</h2>
+                    <div class="flex items-center justify-between mb-4">
+                      <h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ t('gifts.title') }}</h2>
+                      <UiButton v-if="canAddGift" variant="primary" @click="openCreateGift">
+                        <template #icon>
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                          </svg>
+                        </template>
+                        {{ t('gifts.createGift') }}
+                      </UiButton>
+                    </div>
 
                     <!-- Empty state -->
-                    <EmptyStateCard v-if="gifts.length === 0"
+                    <EmptyStateCard v-if="displayedGifts.length === 0"
                                     :title="t('gifts.emptyTitle')"
                                     :description="t('gifts.emptyDescriptionForEvent')"
-                                    :actionTo="`/events/${eventId}/edit`"
                                     :actionLabel="t('gifts.addGifts')">
                         <template #icon>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none"
@@ -97,25 +96,72 @@
                                       d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
                             </svg>
                         </template>
-                        <template #action-icon>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
-                                 stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M12 4v16m8-8H4"/>
-                            </svg>
+                        <template #action>
+                          <UiButton v-if="canAddGift" variant="primary" @click="openCreateGift">
+                            <template #icon>
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                              </svg>
+                            </template>
+                            {{ t('gifts.addGifts') }}
+                          </UiButton>
                         </template>
                     </EmptyStateCard>
 
-                    <!-- Gifts grid -->
-                    <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        <GiftCard
-                            v-for="gift in gifts"
+                    <!-- Gifts content -->
+                    <div v-else>
+                      <!-- Single-person event -->
+                      <div v-if="event?.scope === 'single'">
+                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                          <GiftCard
+                            v-for="gift in displayedGifts"
                             :key="gift.id"
                             :gift="gift"
-                            :isCreator="isCreator"
                             @reserve="handleReserveGift"
                             @cancel-reservation="handleCancelReservation"
-                        />
+                            @edit="openEditGift"
+                            @delete="handleDeleteGift"
+                            @comments="openComments"
+                          />
+                        </div>
+                      </div>
+
+                      <!-- Multiple-person event -->
+                      <div v-else>
+                        <!-- Your gifts -->
+                        <div v-if="yourGifts.length">
+                          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ t('gifts.yourGifts') }}</h3>
+                          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-6">
+                            <GiftCard
+                              v-for="gift in yourGifts"
+                              :key="gift.id"
+                              :gift="gift"
+                              @reserve="handleReserveGift"
+                              @cancel-reservation="handleCancelReservation"
+                              @edit="openEditGift"
+                              @delete="handleDeleteGift"
+                              @comments="openComments"
+                            />
+                          </div>
+                        </div>
+
+                        <!-- Others' gifts -->
+                        <div>
+                          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ t('gifts.othersGifts') }}</h3>
+                          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                            <GiftCard
+                              v-for="gift in othersGifts"
+                              :key="gift.id"
+                              :gift="gift"
+                              @reserve="handleReserveGift"
+                              @cancel-reservation="handleCancelReservation"
+                              @edit="openEditGift"
+                              @delete="handleDeleteGift"
+                              @comments="openComments"
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
                 </div>
             </div>
@@ -129,13 +175,34 @@
             @reserve="confirmReserveGift"
         />
 
-        <!-- Event Edit Modal -->
-        <EventEditModal
+        <!-- Comments Modal -->
+        <CommentsModal
+            :is-open="showCommentsModal"
+            :gift-id="commentsGift?.id"
+            :gift-title="commentsGift?.title"
+            @close="showCommentsModal = false"
+        />
+ 
+         <!-- Gift Create/Edit Modal -->
+        <GiftFormModal
+            :is-open="showGiftModal"
+            :event-id="eventId"
+            :gift="editingGift || undefined"
+            @close="closeGiftModal"
+            @submit="handleCreateGift"
+            @update="handleUpdateGift"
+        />
+
+        <!-- Event Edit Modal (unified) -->
+        <EventModal
             v-if="event"
-            :is-open="showEventEditModal"
-            :event="event"
-            @close="showEventEditModal = false"
-            @update="handleUpdateEvent"
+            :model-value="showEventEditModal"
+            mode="edit"
+            :initial-event="event"
+            :loading="loading"
+            @update:modelValue="(val) => { if (!val) showEventEditModal = false }"
+            @cancel="showEventEditModal = false"
+            @submit="handleUpdateEventFromModal"
         />
 
     </div>
@@ -147,8 +214,12 @@ import {useI18n} from 'vue-i18n'
 import {useRoute, useRouter} from 'vue-router';
 import type {Event, Gift} from '~/types';
 import {useUserStore, useEventStore, useGiftStore} from '~/stores';
-import EventEditModal from '~/components/event/EventEditModal.vue';
+import EventModal from '~/components/event/EventModal.vue';
 import EmptyStateCard from "~/components/ui/EmptyStateCard.vue";
+import UiButton from "~/components/ui/UiButton.vue";
+import GiftFormModal from "~/components/gift/GiftFormModal.vue";
+import GiftCard from "~/components/gift/GiftCard.vue";
+import CommentsModal from "~/components/gift/CommentsModal.vue";
 import {useNotificationStore} from '~/stores';
 
 const route = useRoute();
@@ -169,6 +240,14 @@ const gifts = ref<Gift[]>([]);
 // Reservation state
 const showReservationModal = ref(false);
 const selectedGift = ref<Gift | undefined>(undefined);
+
+// Comments state
+const showCommentsModal = ref(false);
+const commentsGift = ref<Gift | null>(null);
+
+// Gift modal state
+const showGiftModal = ref(false);
+const editingGift = ref<Gift | null>(null);
 
 // Event edit state
 const showEventEditModal = ref(false);
@@ -193,6 +272,27 @@ const isCreator = computed(() => {
     return userStore.user?.id === event.value?.createdBy;
 });
 
+// Computed lists for UI logic
+const currentUserId = computed(() => userStore.currentUser?.id || userStore.user?.id)
+const isTargetPerson = computed(() => event.value?.scope === 'single' && currentUserId.value && event.value?.targetPersonId === currentUserId.value)
+
+const yourGifts = computed(() => gifts.value.filter(g => g.createdBy === (currentUserId.value || '')))
+const targetGifts = computed(() => event.value?.targetPersonId ? gifts.value.filter(g => g.createdBy === event.value!.targetPersonId) : gifts.value)
+const othersGifts = computed(() => gifts.value.filter(g => g.createdBy !== (currentUserId.value || '')))
+const displayedGifts = computed(() => {
+    if (event.value?.scope === 'single') {
+        return isTargetPerson.value ? yourGifts.value : targetGifts.value
+    }
+    return gifts.value
+})
+
+const canAddGift = computed(() => {
+    if (event.value?.scope === 'single') {
+        return isTargetPerson.value
+    }
+    return true
+})
+
 // Initialize the page
 onMounted(async () => {
     // Check if user is logged in
@@ -203,6 +303,10 @@ onMounted(async () => {
 
     await fetchEvent();
     await fetchGifts();
+
+    useHead({
+        title: `Wishlist - ${event.value?.name || ''}`
+    })
 });
 
 // Fetch event
@@ -244,6 +348,89 @@ const fetchGifts = async () => {
     }
 };
 
+// Open create gift modal
+const openCreateGift = () => {
+    editingGift.value = null;
+    showGiftModal.value = true;
+};
+
+// Open edit gift modal
+const openEditGift = (gift: Gift) => {
+    editingGift.value = gift;
+    showGiftModal.value = true;
+};
+
+// Close gift modal
+const closeGiftModal = () => {
+    showGiftModal.value = false;
+    editingGift.value = null;
+};
+
+// Create gift handler
+const handleCreateGift = async (giftData: Omit<Gift, 'id' | 'createdBy'>) => {
+    loading.value = true;
+    error.value = '';
+    try {
+        const newGift = await giftStore.createGift(giftData);
+        if (newGift) {
+            gifts.value.push(newGift);
+            notificationStore.success(t('gifts.createSuccess'));
+            closeGiftModal();
+        } else {
+            error.value = giftStore.error || t('gifts.errors.createFailed');
+        }
+    } catch (e) {
+        console.error('Failed to create gift:', e);
+        error.value = t('gifts.errors.createFailed');
+    } finally {
+        loading.value = false;
+    }
+};
+
+// Update gift handler
+const handleUpdateGift = async (id: string, updates: Partial<Omit<Gift, 'id' | 'createdBy' | 'eventId'>>) => {
+    loading.value = true;
+    error.value = '';
+    try {
+        const updated = await giftStore.updateGift(id, updates);
+        if (updated) {
+            const idx = gifts.value.findIndex(g => g.id === id);
+            if (idx !== -1) gifts.value[idx] = updated;
+            notificationStore.success(t('gifts.updateSuccess'));
+            closeGiftModal();
+        } else {
+            error.value = giftStore.error || t('gifts.errors.updateFailed');
+        }
+    } catch (e) {
+        console.error('Failed to update gift:', e);
+        error.value = t('gifts.errors.updateFailed');
+    } finally {
+        loading.value = false;
+    }
+};
+
+// Delete gift handler
+const handleDeleteGift = async (id: string) => {
+    // Simple confirm; could be replaced with a nicer modal later
+    if (!confirm(t('gifts.confirmDelete'))) return;
+    loading.value = true;
+    error.value = '';
+    try {
+        const success = await giftStore.deleteGift(id);
+        if (success) {
+            gifts.value = gifts.value.filter(g => g.id !== id);
+            notificationStore.success(t('gifts.deleteSuccess'));
+        } else {
+            error.value = giftStore.error || t('gifts.errors.deleteFailed');
+        }
+    } catch (e) {
+        console.error('Failed to delete gift:', e);
+        error.value = t('gifts.errors.deleteFailed');
+    } finally {
+        loading.value = false;
+    }
+};
+
 // Copy the public link to the clipboard
 const copyPublicLink = () => {
     const url = `${window.location.origin}/public/${eventId}`;
@@ -262,6 +449,11 @@ const handleReserveGift = (giftId: string) => {
         selectedGift.value = gift;
         showReservationModal.value = true;
     }
+};
+
+const openComments = (gift: Gift) => {
+    commentsGift.value = gift
+    showCommentsModal.value = true
 };
 
 // Confirm gift reservation
@@ -330,22 +522,17 @@ const handleCancelReservation = async (giftId: string) => {
     }
 };
 
-// Handle event update
-const handleUpdateEvent = async (id: string, name: string, date: string, background?: string) => {
+// Handle event update (legacy handler retained for potential route usage)
+const handleUpdateEvent = async (id: string, name: string, date: string, background?: string, scope?: 'single' | 'multiple', targetPersonId?: string) => {
     loading.value = true;
     error.value = '';
 
     try {
-        const updatedEvent = await eventStore.updateEvent(id, name, date, background);
+        const updatedEvent = await eventStore.updateEvent(id, name, date, background, scope, targetPersonId);
 
         if (updatedEvent) {
-            // Update the event in the local state
             event.value = updatedEvent;
-
-            // Close the modal
             showEventEditModal.value = false;
-
-            // Show success toast
             notificationStore.success('Event updated successfully!')
         } else {
             error.value = eventStore.error || 'Failed to update event';
@@ -356,5 +543,11 @@ const handleUpdateEvent = async (id: string, name: string, date: string, backgro
     } finally {
         loading.value = false;
     }
+};
+
+// Unified modal submit handler
+const handleUpdateEventFromModal = async (payload: { id?: string; name: string; date: string; background?: string; scope?: 'single' | 'multiple'; targetPersonId?: string }) => {
+    const targetId = payload.id || eventId
+    await handleUpdateEvent(targetId, payload.name, payload.date, payload.background, payload.scope, payload.targetPersonId)
 };
 </script>

@@ -1,7 +1,7 @@
 <template>
     <!-- Small View -->
     <div v-if="displayMode === 'small'"
-         class="event-card-small overflow-hidden rounded-lg shadow-sm hover:shadow transition-all duration-200 border border-gray-100 cursor-pointer"
+         class="event-card-small overflow-hidden rounded-lg shadow-xs hover:shadow-sm transition-all duration-200 border border-gray-100 cursor-pointer"
          @click="openEvent">
         <div class="p-2 bg-white">
             <h3 class="text-xs font-medium text-gray-900 truncate">{{ event.name }}</h3>
@@ -40,10 +40,6 @@
             class="relative p-4 bg-cover bg-center"
             :style="backgroundStyle"
         >
-            <!-- Event icon -->
-            <div class="absolute top-3 right-3 bg-white bg-opacity-20 p-2 rounded-full">
-                <Icon name="heroicons-outline:calendar" class="h-5 w-5 text-white" />
-            </div>
 
             <!-- Event details -->
             <div class="text-white" style="text-shadow: 0 1px 3px rgba(0,0,0,0.6);">
@@ -54,6 +50,13 @@
                     <Icon name="heroicons-outline:calendar" class="h-4 w-4 mr-1" />
                     <p class="text-sm text-white text-opacity-90">
                         {{ formattedDate }}
+                    </p>
+                </div>
+
+                <div class="flex items-center mb-2">
+                    <Icon name="fa6-solid:user-large" class="h-4 w-4 mr-1" />
+                    <p class="text-sm text-white text-opacity-90">
+                        personne ciblé
                     </p>
                 </div>
 
@@ -199,14 +202,14 @@
                 <div class="flex space-x-2">
                     <button
                         @click.stop="copyPublicLink"
-                        class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
+                        class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-gray-700 bg-white hover:bg-gray-50"
                     >
                         <Icon name="mdi:share-variant" class="h-4 w-4 mr-1" />
                         Share
                     </button>
                     <NuxtLink
                         :to="`/events/${event.id}/edit`"
-                        class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
+                        class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-gray-700 bg-white hover:bg-gray-50"
                         @click.stop
                     >
                         <Icon name="heroicons-outline:pencil-square" class="h-4 w-4 mr-1" />
@@ -214,7 +217,7 @@
                     </NuxtLink>
                     <button
                         @click.stop="$emit('delete', event.id)"
-                        class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-red-700 bg-white hover:bg-red-50"
+                        class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-red-700 bg-white hover:bg-red-50"
                     >
                         <Icon name="heroicons-outline:trash" class="h-4 w-4 mr-1" />
                         Delete

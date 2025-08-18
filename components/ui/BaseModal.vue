@@ -5,7 +5,7 @@
         <!-- Overlay -->
         <transition name="fade" appear>
           <div
-            class="fixed inset-0 bg-gray-500/75 dark:bg-gray-900/80 transition-opacity"
+            class="fixed inset-0 bg-gray-500/75 dark:bg-gray-900/80 transition-opacity z-40"
             aria-hidden="true"
             @click="onBackdrop"
           />
@@ -14,7 +14,7 @@
         <!-- Panel -->
         <transition name="scale-fade" appear>
           <div
-            class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle"
+            class="relative z-50 inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle"
             :class="panelWidth"
           >
             <!-- Header -->
@@ -25,7 +25,7 @@
                     <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">{{ title }}</h3>
                   </slot>
                 </div>
-                <button v-if="showClose" @click="close" type="button" class="rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <button v-if="showClose" @click="close" type="button" class="rounded-md text-gray-400 hover:text-gray-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-500">
                   <span class="sr-only">Close</span>
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

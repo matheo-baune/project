@@ -9,7 +9,7 @@
             <!-- Validation errors -->
             <div v-if="formErrors.length > 0" class="mb-4 bg-red-50 border-l-4 border-red-400 p-4">
                 <div class="flex">
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                         <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                         </svg>
@@ -24,7 +24,7 @@
             </div>
 
             <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
-                <div class="rounded-md shadow-sm -space-y-px">
+                <div class="rounded-md shadow-xs -space-y-px">
                     <div>
                         <label for="username" class="sr-only">{{ t('login.emailLabel') }}</label>
                         <input
@@ -35,7 +35,7 @@
                             required
                             v-model="username"
                             :class="[
-                                'appearance-none rounded-none relative block w-full px-3 py-2 border placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm',
+                                'appearance-none rounded-none relative block w-full px-3 py-2 border placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-hidden focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm',
                                 formErrors.some(e => e.includes('Email/Username') || e.includes('usernameRequired'))
                                     ? 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500'
                                     : 'border-gray-300'
@@ -53,7 +53,7 @@
                             required
                             v-model="password"
                             :class="[
-                                'appearance-none rounded-none relative block w-full px-3 py-2 border placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm',
+                                'appearance-none rounded-none relative block w-full px-3 py-2 border placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-hidden focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm',
                                 formErrors.some(e => e.includes('Mot de passe') || e.includes('passwordRequired'))
                                     ? 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500'
                                     : 'border-gray-300'
@@ -74,7 +74,7 @@
                 <div>
                     <button
                         type="submit"
-                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         :disabled="loading"
                     >
             <span v-if="loading" class="absolute left-0 inset-y-0 flex items-center pl-3">
@@ -113,13 +113,13 @@
                 <div class="mt-6 grid grid-cols-2 gap-3">
                     <div>
                         <a href="#" @click.prevent="handleRegister"
-                           class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                           class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-xs bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                             {{ t('login.register') }}
                         </a>
                     </div>
                     <div>
                         <a href="#" @click.prevent="handleDemoLogin"
-                           class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                           class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-xs bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                             {{ t('login.demoLogin') }}
                         </a>
                     </div>

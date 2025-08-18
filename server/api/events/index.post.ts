@@ -3,7 +3,7 @@ import db from "~/server/db";
 export default defineEventHandler(async (event) => {
     // Create a new event
     const body = await readBody(event);
-    const { name, date, groupId, createdBy } = body;
+    const { name, date, groupId, createdBy, scope, targetPersonId } = body;
     
     // Validate required fields
     if (!name || !date || !groupId || !createdBy) {
@@ -36,19 +36,41 @@ export default defineEventHandler(async (event) => {
             [name, date, groupId, createdBy]
         );
 
+        const created = result.rows[0];
+
+        // Ensure event_settings table exists
+        await db.query(
+            `CREATE TABLE IF NOT EXISTS event_settings (
+               event_id BIGINT PRIMARY KEY,
+               scope VARCHAR(16) DEFAULT 'multiple',
+               target_person_id BIGINT NULL
+             )`
+        );
+
+        // Upsert settings if provided
+        if (scope || targetPersonId) {
+            await db.query(
+              `INSERT INTO event_settings (event_id, scope, target_person_id)
+               VALUES ($1, $2, $3)
+               ON CONFLICT (event_id) DO UPDATE SET scope = EXCLUDED.scope, target_person_id = EXCLUDED.target_person_id`,
+              [created.id, scope || 'multiple', targetPersonId || null]
+            );
+        }
+
         // Format the response
-        const event = result.rows[0];
         return {
-            id: event.id.toString(),
-            name: event.name,
-            date: event.date,
-            groupId: event.group_id.toString(),
-            createdBy: event.created_by.toString()
+            id: created.id.toString(),
+            name: created.name,
+            date: created.date,
+            groupId: created.group_id.toString(),
+            createdBy: created.created_by.toString(),
+            scope: scope || 'multiple',
+            targetPersonId: targetPersonId ? targetPersonId.toString() : undefined
         };
     } catch (error) {
         console.error('Error creating event:', error);
-        if (error.statusCode) {
-            throw error; // Re-throw validation errors
+        if ((error as any).statusCode) {
+            throw error as any; // Re-throw validation errors
         }
         throw createError({ statusCode: 500, message: 'Internal Server Error' });
     }

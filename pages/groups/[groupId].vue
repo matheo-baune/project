@@ -10,7 +10,7 @@
             <!-- Error state -->
             <div v-else-if="error" class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
                 <div class="flex">
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                         <Icon name="heroicons-solid:x-circle" class="h-5 w-5 text-red-400" aria-hidden="true" />
                     </div>
                     <div class="ml-3">
@@ -40,7 +40,7 @@
                     <div class="flex items-center gap-3">
                         <button
                             @click="showEditGroupModal = true"
-                            class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
+                            class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
                         >
                             <Icon name="fa-regular:edit" size="1.2em" class="me-1"/>
                         </button>
@@ -57,17 +57,19 @@
                 <div class="flex flex-col md:flex-row gap-4">
                     <!-- Members list (left column) -->
                     <div class="w-full md:w-1/4 lg:w-1/5">
-                        <div class="bg-white shadow sm:rounded-lg sticky top-4">
+                        <div class="bg-white shadow-sm sm:rounded-lg sticky top-4">
                             <div class="px-3 py-3 border-b border-gray-200">
-                                <h3 class="text-sm font-medium text-gray-900">Members</h3>
+                                <h3 class="text-sm font-medium text-gray-900">({{group?.members.length}}) Members</h3>
                             </div>
                             <ul class="divide-y divide-gray-100">
                                 <li v-for="member in group?.members" :key="member.id" class="px-3 py-2">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center">
                                             <div
-                                                class="h-7 w-7 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-800 font-semibold text-xs">
-                                                {{ getMemberInitials(member) }}
+                                                class="h-7 w-7 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-800 font-semibold text-xs select-none">
+                                                <img v-if="member?.avatar" :src="member.avatar" alt="User avatar"
+                                                     class="h-full w-full object-cover rounded-full" />
+                                                <span v-else>{{ getMemberInitials(member) }}</span>
                                             </div>
                                             <div class="ml-2 truncate">
                                                 <div class="text-xs font-medium text-gray-900">
@@ -77,10 +79,12 @@
                                         </div>
                                         <div class="flex items-center gap-2">
                                             <span v-if="member.id === group?.createdBy" class="text-xs text-indigo-600"
-                                                  title="Creator">★</span>
+                                                  title="Creator"><Icon name="fa6-solid:crown" class="text-warning"
+                                                                        color="yellow"/></span>
                                             <button
-                                                v-else
-                                                class="text-red-500 hover:text-red-700"
+                                                v-if="currentUser?.id === group?.createdBy && member.id !==
+                                                currentUser?.id"
+                                                class="text-red-500 hover:text-red-700 cursor-pointer"
                                                 title="Remove member"
                                                 @click="removeMemberInline(member.id)"
                                             >
@@ -90,35 +94,20 @@
                                     </div>
                                 </li>
                             </ul>
-                            <div class="p-3 border-t border-gray-200">
-                                <div class="space-y-2">
-                                    <input v-model="inviteEmails" type="text" placeholder="Invite by email (comma or space separated)"
-                                           class="w-full px-2 py-1 border rounded text-xs"/>
-                                    <p class="text-[10px] text-gray-500">Example: alice@mail.com, bob@mail.com</p>
-                                    <button
-                                        class="w-full inline-flex items-center justify-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
-                                        @click="addMemberInline"
-                                        :disabled="!inviteEmails || modalLoading"
-                                    >
-                                        <Icon name="heroicons-outline:plus" class="h-4 w-4 mr-1" />
-                                        Invite
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                     </div>
 
                     <!-- Events section (right column) -->
                     <div class="w-full md:w-3/4 lg:w-4/5">
                         <div class="flex justify-between items-center mb-3">
-                            <h2 class="text-lg font-medium text-gray-900">Events</h2>
+                            <h2 class="text-lg font-medium text-gray-900 dark:text-white">Events</h2>
 
                             <!-- Display mode selector -->
                             <div
-                                class="flex items-center space-x-2 bg-white rounded-lg shadow-sm p-1 border border-gray-100">
+                                class="flex items-center space-x-2 bg-white rounded-lg shadow-xs p-1 border border-gray-100">
                                 <button
                                     @click="displayMode = 'small'"
-                                    class="p-1 rounded"
+                                    class="p-1 rounded-sm"
                                     :class="displayMode === 'small' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'"
                                     title="Small grid view"
                                 >
@@ -126,7 +115,7 @@
                                 </button>
                                 <button
                                     @click="displayMode = 'card'"
-                                    class="p-1 rounded"
+                                    class="p-1 rounded-sm"
                                     :class="displayMode === 'card' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'"
                                     title="Card view"
                                 >
@@ -134,7 +123,7 @@
                                 </button>
                                 <button
                                     @click="displayMode = 'large'"
-                                    class="p-1 rounded"
+                                    class="p-1 rounded-sm"
                                     :class="displayMode === 'large' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'"
                                     title="Large card view"
                                 >
@@ -180,93 +169,15 @@
         </div>
 
         <!-- Create/Edit Event Modal -->
-        <div v-if="showCreateEventModal" class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title"
-             role="dialog" aria-modal="true">
-            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <!-- Background overlay -->
-                <div
-                    class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-                    aria-hidden="true"
-                    @click="closeModals"
-                ></div>
-
-                <!-- Modal panel -->
-                <div
-                    class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <div class="sm:flex sm:items-start">
-                            <div
-                                class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">
-                                <Icon name="heroicons-outline:calendar" class="h-6 w-6 text-indigo-600" />
-                            </div>
-                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                    Create New Event
-                                </h3>
-                                <div class="mt-4">
-                                    <form @submit.prevent="handleSubmitEvent">
-                                        <!-- Event Name -->
-                                        <div>
-                                            <label for="event-name" class="block text-sm font-medium text-gray-700">
-                                                Event Name *
-                                            </label>
-                                            <div class="mt-1">
-                                                <input
-                                                    type="text"
-                                                    name="event-name"
-                                                    id="event-name"
-                                                    v-model="eventForm.name"
-                                                    required
-                                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                                    placeholder="Christmas, Birthday, Wedding..."
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <!-- Event Date -->
-                                        <div class="mt-4">
-                                            <label for="event-date" class="block text-sm font-medium text-gray-700">
-                                                Event Date *
-                                            </label>
-                                            <div class="mt-1">
-                                                <input
-                                                    type="date"
-                                                    name="event-date"
-                                                    id="event-date"
-                                                    v-model="eventForm.date"
-                                                    required
-                                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md dark:text-black"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <!-- Modal actions -->
-                                        <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
-                                            <button
-                                                type="submit"
-                                                :disabled="modalLoading || !eventForm.name || !eventForm.date"
-                                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
-                                                :class="{ 'opacity-50 cursor-not-allowed': modalLoading || !eventForm.name || !eventForm.date }"
-                                            >
-                                                <Icon v-if="modalLoading" name="line-md:loading-twotone-loop" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
-                                                Create Event
-                                            </button>
-                                            <button
-                                                type="button"
-                                                @click="closeModals"
-                                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                                            >
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <EventModal
+          :model-value="showCreateEventModal"
+          mode="create"
+          :loading="modalLoading"
+          :members="group?.members || []"
+          @update:modelValue="(val) => { if (!val) closeModals() }"
+          @cancel="closeModals"
+          @submit="handleSubmitEvent"
+        />
 
         <!-- Edit Group Modal -->
         <GroupModal
@@ -282,60 +193,33 @@
         />
 
         <!-- Delete Confirmation Modal -->
-        <div v-if="showDeleteModal" class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title"
-             role="dialog" aria-modal="true">
-            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <!-- Background overlay -->
-                <div
-                    class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-                    aria-hidden="true"
-                    @click="showDeleteModal = false"
-                ></div>
-
-                <!-- Modal panel -->
-                <div
-                    class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <div class="sm:flex sm:items-start">
-                            <div
-                                class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                                <Icon name="heroicons-outline:exclamation-triangle" class="h-6 w-6 text-red-600" aria-hidden="true" />
-                            </div>
-                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                    Delete Event
-                                </h3>
-                                <div class="mt-2">
-                                    <p class="text-sm text-gray-500">
-                                        Are you sure you want to delete this event? All gifts associated with this event
-                                        will be permanently removed. This action cannot be undone.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button
-                            type="button"
-                            @click="confirmDeleteEvent"
-                            :disabled="modalLoading"
-                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-                            :class="{ 'opacity-50 cursor-not-allowed': modalLoading }"
-                        >
-                            <Icon v-if="modalLoading" name="line-md:loading-twotone-loop" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
-                            Delete
-                        </button>
-                        <button
-                            type="button"
-                            @click="showDeleteModal = false"
-                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                </div>
+        <BaseModal :is-open="showDeleteModal" :title="'Delete Event'" @close="showDeleteModal = false">
+          <template #header>
+            <div class="flex items-center gap-3">
+              <div class="mx-auto sm:mx-0 shrink-0 flex items-center justify-center h-10 w-10 rounded-full bg-red-100">
+                <Icon name="heroicons-outline:exclamation-triangle" class="h-6 w-6 text-red-600" aria-hidden="true" />
+              </div>
+              <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">Delete Event</h3>
             </div>
-        </div>
+          </template>
+
+          <p class="text-sm text-gray-600 dark:text-gray-300">
+            Are you sure you want to delete this event? All gifts associated with this event will be permanently removed. This action cannot be undone.
+          </p>
+
+          <template #footer>
+            <UiButton variant="primary" class="bg-red-600 hover:bg-red-700 focus:ring-red-500"
+                      :disabled="modalLoading" @click="confirmDeleteEvent">
+              <template #icon>
+                <Icon v-if="modalLoading" name="line-md:loading-twotone-loop" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
+              </template>
+              Delete
+            </UiButton>
+            <UiButton class="sm:ml-3 sm:mt-0 mt-3" variant="secondary" @click="showDeleteModal = false">
+              Cancel
+            </UiButton>
+          </template>
+        </BaseModal>
     </div>
 </template>
 
@@ -345,6 +229,9 @@ import {useRoute, useRouter} from 'vue-router';
 import type {Group, Event, User} from '~/types';
 import {useUserStore, useGroupStore, useEventStore} from '~/stores';
 import GroupModal from '~/components/group/GroupModal.vue';
+import BaseModal from "~/components/ui/BaseModal.vue";
+import UiButton from "~/components/ui/UiButton.vue";
+import EventModal from "~/components/event/EventModal.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -576,17 +463,23 @@ const handleSubmitGroup = async (payload?: { name: string; background?: string; 
 };
 
 // Handle event form submission
-const handleSubmitEvent = async () => {
-    if (!eventForm.value.name || !eventForm.value.date) return;
+const handleSubmitEvent = async (payload?: { id?: string; name: string; date: string; background?: string; scope?: 'single' | 'multiple'; targetPersonId?: string }) => {
+    const hasPayload = !!payload && !!payload.name && !!payload.date
+    const hasForm = !!eventForm.value.name && !!eventForm.value.date
+    if (!hasPayload && !hasForm) return;
 
     modalLoading.value = true;
 
     try {
         // Create event
+        const name = payload?.name ?? eventForm.value.name
+        const date = payload?.date ?? eventForm.value.date
         const newEvent = await eventStore.createEvent(
-            eventForm.value.name,
-            eventForm.value.date,
-            groupId
+            name,
+            date,
+            groupId,
+            payload?.scope,
+            payload?.targetPersonId
         );
 
         if (newEvent) {

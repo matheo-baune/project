@@ -167,7 +167,7 @@ export const useEventStore = defineStore('event', {
     },
 
     // Create a new event
-    async createEvent(name: string, date: string, groupId: string) {
+    async createEvent(name: string, date: string, groupId: string, scope?: 'single' | 'multiple', targetPersonId?: string) {
       this.loading = true;
       this.error = null;
 
@@ -187,7 +187,9 @@ export const useEventStore = defineStore('event', {
             name,
             date,
             groupId,
-            createdBy: userId
+            createdBy: userId,
+            scope,
+            targetPersonId
           }
         });
 
@@ -214,7 +216,7 @@ export const useEventStore = defineStore('event', {
     },
 
     // Update an existing event
-    async updateEvent(id: string, name: string, date: string, background?: string) {
+    async updateEvent(id: string, name: string, date: string, background?: string, scope?: 'single' | 'multiple', targetPersonId?: string) {
       this.loading = true;
       this.error = null;
 
@@ -234,7 +236,9 @@ export const useEventStore = defineStore('event', {
             name,
             date,
             background,
-            userId
+            userId,
+            scope,
+            targetPersonId
           }
         });
 

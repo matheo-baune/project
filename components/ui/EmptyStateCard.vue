@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white shadow rounded-lg p-8 text-center dark:bg-gray-800 dark:border dark:border-gray-700">
+  <div class="bg-white shadow-sm rounded-lg p-8 text-center dark:bg-gray-800 dark:border dark:border-gray-700">
     <div class="mx-auto">
       <slot name="icon">
         <!-- default icon slot (optional) -->

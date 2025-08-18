@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen dark:bg-gray-900 transition-colors duration-200">
+    <div class="dark:bg-gray-900 transition-colors duration-200">
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 dark:text-white">
             <div class="flex justify-between items-center mb-6">
@@ -7,10 +7,10 @@
                 <div class="flex items-center space-x-3">
                     <!-- Display mode selector -->
                     <div
-                        class="flex items-center space-x-2 bg-white rounded-lg shadow-sm p-1 border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+                        class="flex items-center space-x-2 bg-white rounded-lg shadow-xs p-1 border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
                         <button
                             @click="displayMode = 'card'"
-                            class="p-1 rounded"
+                            class="p-1 rounded-sm"
                             :class="displayMode === 'card' ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:bg-opacity-50 dark:text-indigo-300' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
                             :title="t('dashboard.cardView')"
                         >
@@ -22,7 +22,7 @@
                         </button>
                         <button
                             @click="displayMode = 'large'"
-                            class="p-1 rounded"
+                            class="p-1 rounded-sm"
                             :class="displayMode === 'large' ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:bg-opacity-50 dark:text-indigo-300' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
                             :title="t('dashboard.largeCardView')"
                         >
@@ -36,7 +36,7 @@
 
                     <button
                         @click="showCreateGroupModal = true"
-                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-indigo-700 dark:hover:bg-indigo-600 dark:focus:ring-indigo-400 dark:focus:ring-offset-gray-900"
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-xs text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-indigo-700 dark:hover:bg-indigo-600 dark:focus:ring-indigo-400 dark:focus:ring-offset-gray-900"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
                              stroke="currentColor">
@@ -55,7 +55,7 @@
             <!-- Error state -->
             <div v-else-if="error" class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
                 <div class="flex">
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                         <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                              fill="currentColor" aria-hidden="true">
                             <path fill-rule="evenodd"
@@ -119,75 +119,35 @@
         />
 
         <!-- Delete Confirmation Modal -->
-        <div v-if="showDeleteModal" class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title"
-             role="dialog" aria-modal="true">
-            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <!-- Background overlay -->
-                <div
-                    class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-                    aria-hidden="true"
-                    @click="showDeleteModal = false"
-                ></div>
-
-                <!-- Modal panel -->
-                <div
-                    class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <div class="sm:flex sm:items-start">
-                            <div
-                                class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                                <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                     viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                </svg>
-                            </div>
-                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                    Delete Group
-                                </h3>
-                                <div class="mt-2">
-                                    <p class="text-sm text-gray-500">
-                                        Are you sure you want to delete this group? All events and gifts associated with
-                                        this group will be permanently removed. This action cannot be undone.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button
-                            type="button"
-                            @click="confirmDeleteGroup"
-                            :disabled="modalLoading"
-                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-                            :class="{ 'opacity-50 cursor-not-allowed': modalLoading }"
-                        >
-                            <svg
-                                v-if="modalLoading"
-                                class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                            >
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                        stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor"
-                                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            {{ t('common.delete') }}
-                        </button>
-                        <button
-                            type="button"
-                            @click="showDeleteModal = false"
-                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                        >
-                            {{ t('common.cancel') }}
-                        </button>
-                    </div>
-                </div>
+        <BaseModal :is-open="showDeleteModal" :title="t('groups.deleteGroup')" @close="showDeleteModal = false">
+          <template #header>
+            <div class="flex items-center gap-3">
+              <div class="mx-auto sm:mx-0 shrink-0 flex items-center justify-center h-10 w-10 rounded-full bg-red-100">
+                <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">{{ t('groups.deleteGroup') }}</h3>
             </div>
-        </div>
+          </template>
+
+          <p class="text-sm text-gray-600 dark:text-gray-300">
+            {{ t('groups.confirmDelete') || 'Are you sure you want to delete this group? All events and gifts associated with this group will be permanently removed. This action cannot be undone.' }}
+          </p>
+
+          <template #footer>
+            <UiButton variant="primary" class="bg-red-600 hover:bg-red-700 focus:ring-red-500"
+                      :disabled="modalLoading" @click="confirmDeleteGroup">
+              <template #icon>
+                <Icon v-if="modalLoading" name="line-md:loading-twotone-loop" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
+              </template>
+              {{ t('common.delete') }}
+            </UiButton>
+            <UiButton class="sm:ml-3 sm:mt-0 mt-3" variant="secondary" @click="showDeleteModal = false">
+              {{ t('common.cancel') }}
+            </UiButton>
+          </template>
+        </BaseModal>
     </div>
 </template>
 
@@ -200,6 +160,8 @@ import {useUserStore, useGroupStore, useNotificationStore} from '~/stores';
 import GroupModal from '~/components/group/GroupModal.vue';
 import EmptyStateCard from "~/components/ui/EmptyStateCard.vue";
 import UiLoader from "~/components/ui/UiLoader.vue";
+import BaseModal from "~/components/ui/BaseModal.vue";
+import UiButton from "~/components/ui/UiButton.vue";
 
 const { t } = useI18n()
 

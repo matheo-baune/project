@@ -7,7 +7,7 @@
   >
     <template #header>
       <div class="flex items-center gap-3">
-        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+        <div class="shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
           <Icon name="mdi:account-group-outline" class="h-6 w-6 text-indigo-600" />
         </div>
         <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
@@ -30,7 +30,7 @@
               id="group-name"
               v-model="localForm.name"
               required
-              class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md dark:text-black"
+              class="shadow-xs focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md dark:text-white"
               :placeholder="t('dashboard.createGroup') + '...'"
             />
           </div>
@@ -47,7 +47,7 @@
               name="group-background"
               id="group-background"
               v-model="localForm.background"
-              class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md dark:text-black"
+              class="shadow-xs focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md dark:text-white"
               placeholder="https://example.com/image.jpg"
             />
             <div v-if="localForm.background" class="mt-2">
@@ -97,7 +97,7 @@
               <button
                 type="button"
                 @click="addMember"
-                class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+                class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-hidden"
               >
                 <Icon name="heroicons-outline:plus" class="h-4 w-4 mr-1" />
                 {{ t('groups.addMember') }}

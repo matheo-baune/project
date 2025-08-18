@@ -13,9 +13,9 @@ export default defineEventHandler(async (event) => {
 
     try {
         // Get the user ID from the query parameters or session
-        const query = getQuery(event);
-        const userId = query.userId;
-        const isPublic = query.public === 'true';
+        const q = getQuery(event);
+        const userId = q.userId as string | undefined;
+        const isPublic = q.public === 'true';
 
         // For public view, we don't need authentication
         if (!isPublic && !userId) {
@@ -26,10 +26,20 @@ export default defineEventHandler(async (event) => {
         }
 
         // Get the event
+        // Ensure event_settings table exists (safe no-op if already exists)
+        await query(
+          `CREATE TABLE IF NOT EXISTS event_settings (
+             event_id BIGINT PRIMARY KEY,
+             scope VARCHAR(16) DEFAULT 'multiple',
+             target_person_id BIGINT NULL
+           )`
+        );
+
         const eventResult = await query(
-            `SELECT e.*, g.id as group_id 
+            `SELECT e.*, g.id as group_id, es.scope, es.target_person_id 
              FROM events e
              JOIN groups g ON e.group_id = g.id
+             LEFT JOIN event_settings es ON es.event_id = e.id
              WHERE e.id = $1`,
             [eventId]
         );
@@ -44,7 +54,7 @@ export default defineEventHandler(async (event) => {
         const eventData = eventResult.rows[0];
 
         // For non-public view, check if the user is a member of the group
-        if (!isPublic) {
+        if (!isPublic && userId) {
             const memberCheck = await query(
                 `SELECT * FROM group_members 
                  WHERE group_id = $1 AND user_id = $2`,
@@ -65,12 +75,14 @@ export default defineEventHandler(async (event) => {
             name: eventData.name,
             date: eventData.date,
             groupId: eventData.group_id.toString(),
-            createdBy: eventData.created_by.toString()
+            createdBy: eventData.created_by.toString(),
+            scope: (eventData.scope as string) || 'multiple',
+            targetPersonId: eventData.target_person_id ? eventData.target_person_id.toString() : undefined
         };
     } catch (error) {
         console.error('Error fetching event:', error);
-        if (error.statusCode) {
-            throw error; // Re-throw validation errors
+        if ((error as any).statusCode) {
+            throw error as any; // Re-throw validation errors
         }
         throw createError({ statusCode: 500, message: 'Internal Server Error' });
     }

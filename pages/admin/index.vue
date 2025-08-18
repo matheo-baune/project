@@ -1,15 +1,14 @@
 <template>
   <div>
-
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
             </div>
 
             <!-- Admin not authorized -->
             <div v-if="!userStore.isAdmin" class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
                 <div class="flex">
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                         <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                              fill="currentColor" aria-hidden="true">
                             <path fill-rule="evenodd"
@@ -27,7 +26,7 @@
 
             <!-- Admin Dashboard Content -->
             <div v-else>
-                <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
+                <div class="bg-white shadow-sm overflow-hidden sm:rounded-lg mb-6">
                     <div class="px-4 py-5 sm:px-6">
                         <h3 class="text-lg leading-6 font-medium text-gray-900">Admin Controls</h3>
                         <p class="mt-1 max-w-2xl text-sm text-gray-500">Manage users, groups, events, and gifts.</p>
@@ -35,10 +34,10 @@
                     <div class="border-t border-gray-200">
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
                             <!-- Users Management Card -->
-                            <div class="bg-white overflow-hidden shadow rounded-lg">
+                            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
                                 <div class="px-4 py-5 sm:p-6">
                                     <div class="flex items-center">
-                                        <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
+                                        <div class="shrink-0 bg-indigo-500 rounded-md p-3">
                                             <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg"
                                                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -66,10 +65,10 @@
                             </div>
 
                             <!-- Groups Management Card -->
-                            <div class="bg-white overflow-hidden shadow rounded-lg">
+                            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
                                 <div class="px-4 py-5 sm:p-6">
                                     <div class="flex items-center">
-                                        <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
+                                        <div class="shrink-0 bg-green-500 rounded-md p-3">
                                             <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg"
                                                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -97,10 +96,10 @@
                             </div>
 
                             <!-- Events Management Card -->
-                            <div class="bg-white overflow-hidden shadow rounded-lg">
+                            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
                                 <div class="px-4 py-5 sm:p-6">
                                     <div class="flex items-center">
-                                        <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
+                                        <div class="shrink-0 bg-yellow-500 rounded-md p-3">
                                             <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg"
                                                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -128,10 +127,10 @@
                             </div>
 
                             <!-- Gifts Management Card -->
-                            <div class="bg-white overflow-hidden shadow rounded-lg">
+                            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
                                 <div class="px-4 py-5 sm:p-6">
                                     <div class="flex items-center">
-                                        <div class="flex-shrink-0 bg-red-500 rounded-md p-3">
+                                        <div class="shrink-0 bg-red-500 rounded-md p-3">
                                             <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg"
                                                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -162,7 +161,7 @@
                 </div>
 
                 <!-- Quick Stats -->
-                <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                <div class="bg-white shadow-sm overflow-hidden sm:rounded-lg">
                     <div class="px-4 py-5 sm:px-6">
                         <h3 class="text-lg leading-6 font-medium text-gray-900">Quick Stats</h3>
                         <p class="mt-1 max-w-2xl text-sm text-gray-500">Overview of system data.</p>

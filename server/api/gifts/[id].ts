@@ -36,9 +36,10 @@ export const put = defineEventHandler(async (event) => {
     }
 
     const body = await readBody(event);
-    const { title, link, image, price, userId } = body;
+    const { title, link, image, price, userId, createdBy } = body;
 
-    if (!userId) {
+    const actorId = userId || createdBy;
+    if (!actorId) {
       throw createError({ statusCode: 400, message: 'User ID is required' });
     }
 
@@ -52,7 +53,7 @@ export const put = defineEventHandler(async (event) => {
       throw createError({ statusCode: 404, message: 'Gift not found' });
     }
 
-    if (checkResult.rows[0].created_by.toString() !== userId.toString()) {
+    if (checkResult.rows[0].created_by.toString() !== actorId.toString()) {
       throw createError({ statusCode: 403, message: 'Not authorized to update this gift' });
     }
 
@@ -88,9 +89,10 @@ export const del = defineEventHandler(async (event) => {
     }
 
     const body = await readBody(event);
-    const { userId } = body;
+    const { userId, createdBy } = body;
+    const actorId = userId || createdBy;
 
-    if (!userId) {
+    if (!actorId) {
       throw createError({ statusCode: 400, message: 'User ID is required' });
     }
 
@@ -104,7 +106,7 @@ export const del = defineEventHandler(async (event) => {
       throw createError({ statusCode: 404, message: 'Gift not found' });
     }
 
-    if (checkResult.rows[0].created_by.toString() !== userId.toString()) {
+    if (checkResult.rows[0].created_by.toString() !== actorId.toString()) {
       throw createError({ statusCode: 403, message: 'Not authorized to delete this gift' });
     }
 

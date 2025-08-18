@@ -3,11 +3,11 @@ import { convertKeysToCamelCase } from '../utils/caseConversion';
 
 // Create a new Pool instance with connection details
 const pool = new Pool({
-  user: process.env.POSTGRES_USER ?? 'admin',
-  password: process.env.POSTGRES_PASSWORD ?? 'admin',
-  host: process.env.POSTGRES_HOST ?? 'localhost',
+  user: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+  host: process.env.POSTGRES_HOST,
   port: parseInt(process.env.POSTGRES_PORT ?? '5432'),
-  database: process.env.POSTGRES_DB ?? 'admin',
+  database: process.env.POSTGRES_DB,
 });
 
 // Test the connection
@@ -26,7 +26,7 @@ export const query = async (text: string, params?: any[]) => {
   try {
     const res = await pool.query(text, params);
     const duration = Date.now() - start;
-    console.log('Executed query', { text, rows: res.rowCount });
+    console.log('Executed query', text);
 
     // Convert snake_case keys to camelCase
     if (res.rows && res.rows.length > 0) {

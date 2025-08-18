@@ -32,15 +32,24 @@ CREATE TABLE IF NOT EXISTS group_members
     PRIMARY KEY (group_id, user_id)
 );
 
+-- Event members junction table
+CREATE TABLE IF NOT EXISTS event_members
+(
+    event_id INTEGER NOT NULL REFERENCES events (id) ON DELETE CASCADE,
+    user_id  INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    is_target BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY (event_id, user_id)
+);
+
 -- Events table
 CREATE TABLE IF NOT EXISTS events
 (
-    id         SERIAL PRIMARY KEY,
-    name       VARCHAR(255) NOT NULL,
-    date       DATE         NOT NULL,
-    group_id   INTEGER      NOT NULL REFERENCES groups (id) ON DELETE CASCADE,
-    created_by INTEGER      NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    id              SERIAL PRIMARY KEY,
+    name            VARCHAR(255) NOT NULL,
+    date            DATE         NOT NULL,
+    group_id        INTEGER      NOT NULL REFERENCES groups (id) ON DELETE CASCADE,
+    created_by      INTEGER      NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    created_at      TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Gifts table
@@ -62,21 +71,7 @@ CREATE TABLE IF NOT EXISTS reservations
 (
     id          SERIAL PRIMARY KEY,
     gift_id     INTEGER      NOT NULL REFERENCES gifts (id) ON DELETE CASCADE,
+    comment     VARCHAR(255) NULL DEFAULT NULL,
     reserved_by VARCHAR(255) NOT NULL,
     reserved_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
-
--- Insert some sample data
-INSERT INTO users (firstname, lastname, username, email, password, is_admin)
-VALUES ('John', 'Doe', 'johndoe', 'john@example.com', 'password_hash_placeholder'),
-       ('Jane', 'Doe', 'janedoe', 'jane@example.com', 'password_hash_placeholder'),
-       ('Bob', 'Smith', 'bobsmith', 'bob@example.com', 'password_hash_placeholder'),
-       ('Alice', 'Johnson', 'alicejohnson', 'alice@example.com', 'password_hash_placeholder')
-ON CONFLICT (username) DO NOTHING;
-
--- Insert sample groups
-INSERT INTO groups (name, created_by)
-VALUES ('Family', 1),
-       ('Friends', 2),
-       ('Work', 3)
-ON CONFLICT (name) DO NOTHING;

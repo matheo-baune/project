@@ -1,8 +1,8 @@
 <template>
-  <div class="bg-white overflow-hidden shadow rounded-lg relative">
-    <!-- Reserved badge -->
+  <div class="bg-white overflow-hidden shadow-sm rounded-lg relative">
+    <!-- Reserved badge (hidden for creator to avoid revealing reservation state) -->
     <div 
-      v-if="gift.reservedBy || isReserved || gift.isReserved" 
+      v-if="!isCreator && (gift.reservedBy || isReserved || gift.isReserved)" 
       class="absolute top-0 right-0 mt-2 mr-2 z-10"
     >
       <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -54,46 +54,38 @@
 
     <!-- Actions -->
     <div class="bg-gray-50 px-4 py-3">
-      <div class="flex justify-between">
+      <div class="flex justify-between items-center gap-2">
         <!-- Creator actions -->
         <div v-if="isCreator && !isPublicView" class="flex space-x-2">
           <button 
             @click="$emit('edit', gift)"
-            class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             Edit
           </button>
           <button 
             @click="$emit('delete', gift.id)"
-            class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-red-700 bg-white hover:bg-red-50 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
           >
             Delete
           </button>
         </div>
 
-        <!-- Creator view of reservations -->
-        <div v-if="isCreator && !isPublicView" class="w-full">
-          <div v-if="gift.isReserved || gift.reservedBy" class="text-xs text-gray-500 text-center">
-            Reserved by someone
-          </div>
-          <div v-else class="text-xs text-gray-500 text-center">
-            Not yet reserved
-          </div>
-        </div>
+        <!-- Creator view of reservations intentionally hidden to avoid revealing reservation state to the owner -->
 
         <!-- Reservation actions for non-creators -->
         <div v-else class="w-full">
           <button 
             v-if="!gift.reservedBy && !isReserved && !gift.isReserved"
             @click="$emit('reserve', gift.id)"
-            class="w-full inline-flex justify-center items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            class="w-full inline-flex justify-center items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             Reserve this gift
           </button>
           <button 
             v-else-if="isReservedByCurrentUser && !isPublicView"
             @click="$emit('cancel-reservation', gift.id)"
-            class="w-full inline-flex justify-center items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            class="w-full inline-flex justify-center items-center px-3 py-1.5 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             Cancel reservation
           </button>
@@ -109,6 +101,15 @@
           >
             Already reserved
           </div>
+        </div>
+        <!-- Comments button (always available) -->
+        <div>
+          <button
+            @click="$emit('comments', gift)"
+            class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Comments
+          </button>
         </div>
       </div>
     </div>
@@ -131,6 +132,7 @@ const emit = defineEmits<{
   (e: 'delete', id: string): void;
   (e: 'reserve', id: string): void;
   (e: 'cancel-reservation', id: string): void;
+  (e: 'comments', gift: Gift): void;
 }>();
 
 const userStore = useUserStore();

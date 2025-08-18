@@ -2,7 +2,7 @@
     <!-- Card View (Default) -->
     <div
         v-if="displayMode === 'card'"
-        class="overflow-hidden shadow rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md dark:bg-gray-800 dark:border-gray-700"
+        class="overflow-hidden shadow-sm rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md dark:bg-gray-800 dark:border-gray-700"
         @click="$emit('click', group)"
     >
         <!-- Background image or gradient -->
@@ -44,6 +44,7 @@
                 </div>
             </div>
         </div>
+
         <div class="bg-gray-50 px-4 py-4 sm:px-6 dark:bg-gray-800 dark:text-white">
             <div class="flex justify-between">
                 <NuxtLink
@@ -60,17 +61,17 @@
                     </svg>
                     View Events
                 </NuxtLink>
-                <div class="flex space-x-2">
+                <div class="flex space-x-2" v-if="group.created_by === currentUser?.id">
                     <button
                         @click.stop="$emit('edit', group)"
-                        class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
+                        class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
                     >
                         <Icon name="fa-regular:edit" size="1.2em" class="me-1"/>
                         {{ t('common.edit') }}
                     </button>
                     <button
                         @click.stop="$emit('delete', group.id)"
-                        class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-red-700 bg-white hover:bg-red-50 dark:bg-gray-700 dark:text-red-400 dark:border-gray-600 dark:hover:bg-gray-600"
+                        class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-red-700 bg-white hover:bg-red-50 dark:bg-gray-700 dark:text-red-400 dark:border-gray-600 dark:hover:bg-gray-600"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
                              stroke="currentColor">
@@ -147,7 +148,7 @@
                 <div class="flex space-x-2">
                     <button
                         @click.stop="$emit('edit', group)"
-                        class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
+                        class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
                              stroke="currentColor">
@@ -158,7 +159,7 @@
                     </button>
                     <button
                         @click.stop="$emit('delete', group.id)"
-                        class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-red-700 bg-white hover:bg-red-50 dark:bg-gray-700 dark:text-red-400 dark:border-gray-600 dark:hover:bg-gray-600"
+                        class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-red-700 bg-white hover:bg-red-50 dark:bg-gray-700 dark:text-red-400 dark:border-gray-600 dark:hover:bg-gray-600"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
                              stroke="currentColor">
@@ -178,6 +179,7 @@
 import {computed} from 'vue';
 import { useI18n } from 'vue-i18n'
 import type {Group, User} from '~/types';
+import {useUserStore} from "~/stores";
 
 const props = defineProps<{
     group: Group;
@@ -185,6 +187,10 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n()
+
+//Get currentUser
+const userStore = useUserStore();
+const currentUser = computed(() => {return userStore.currentUser})
 
 // Default to card view if no display mode is provided
 const displayMode = computed(() => props.displayMode || 'card');
