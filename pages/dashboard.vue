@@ -52,24 +52,6 @@
                 <UiLoader size="lg" color="text-indigo-600" />
             </div>
 
-            <!-- Error state -->
-            <div v-else-if="error" class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-                <div class="flex">
-                    <div class="shrink-0">
-                        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                             fill="currentColor" aria-hidden="true">
-                            <path fill-rule="evenodd"
-                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                  clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm text-red-700">
-                            {{ error }}
-                        </p>
-                    </div>
-                </div>
-            </div>
 
             <!-- Empty state -->
             <EmptyStateCard v-else-if="groups.length === 0"
@@ -132,14 +114,14 @@
           </template>
 
           <p class="text-sm text-gray-600 dark:text-gray-300">
-            {{ t('groups.confirmDelete') || 'Are you sure you want to delete this group? All events and gifts associated with this group will be permanently removed. This action cannot be undone.' }}
+            {{ t('groups.confirmDelete') }}
           </p>
 
           <template #footer>
             <UiButton variant="primary" class="bg-red-600 hover:bg-red-700 focus:ring-red-500"
                       :disabled="modalLoading" @click="confirmDeleteGroup">
               <template #icon>
-                <Icon v-if="modalLoading" name="line-md:loading-twotone-loop" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
+                <NuxtIcon v-if="modalLoading" name="line-md:loading-twotone-loop" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
               </template>
               {{ t('common.delete') }}
             </UiButton>
@@ -172,7 +154,6 @@ const notificationStore = useNotificationStore();
 
 // State
 const loading = ref(true);
-const error = ref('');
 const groups = ref<Group[]>([]);
 const displayMode = ref<'card' | 'large'>('card');
 
@@ -195,8 +176,8 @@ const formErrors = ref<string[]>([]);
 
 // Watch for changes in form fields to clear specific errors
 watch(() => groupForm.value.name, (newValue) => {
-    if (newValue && formErrors.value.includes('Le nom du groupe est requis')) {
-        formErrors.value = formErrors.value.filter(error => error !== 'Le nom du groupe est requis');
+    if (newValue && formErrors.value.includes(t('groups.validation.nameRequired'))) {
+        formErrors.value = formErrors.value.filter(error => error !== t('groups.validation.nameRequired'));
     }
 });
 
@@ -215,13 +196,12 @@ onMounted(async () => {
 // Fetch groups
 const fetchGroups = async () => {
     loading.value = true;
-    error.value = '';
 
     try {
         groups.value = await groupStore.fetchGroups();
     } catch (err) {
         console.error('Failed to fetch groups:', err);
-        error.value = 'Failed to load groups. Please try again.';
+        notificationStore.error(t('groups.errors.fetchFailed'));
     } finally {
         loading.value = false;
     }
@@ -260,12 +240,11 @@ const confirmDeleteGroup = async () => {
             // Toast success
             notificationStore.success(t('groups.deleteSuccess'));
         } else {
-            error.value = groupStore.error || 'Failed to delete group';
             notificationStore.error(t('groups.errors.deleteFailed'));
         }
     } catch (err) {
         console.error('Failed to delete group:', err);
-        error.value = 'Failed to delete group. Please try again.';
+        notificationStore.error(t('groups.errors.deleteFailed'));
     } finally {
         modalLoading.value = false;
     }
@@ -279,7 +258,7 @@ const handleSubmitGroup = async (payload?: { name: string; background?: string; 
     // Validate required fields
     const name = payload?.name ?? groupForm.value.name;
     if (!name) {
-        formErrors.value.push("Le nom du groupe est requis");
+        formErrors.value.push(t('groups.validation.nameRequired'));
     }
 
     // If there are validation errors, don't proceed
@@ -313,7 +292,6 @@ const handleSubmitGroup = async (payload?: { name: string; background?: string; 
                 notificationStore.success(t('groups.updateSuccess'));
                 closeModals();
             } else {
-                error.value = groupStore.error || 'Failed to update group';
                 notificationStore.error(t('groups.errors.updateFailed'));
             }
         } else {
@@ -331,13 +309,16 @@ const handleSubmitGroup = async (payload?: { name: string; background?: string; 
                 notificationStore.success(t('groups.createSuccess'));
                 closeModals();
             } else {
-                error.value = groupStore.error || 'Failed to create group';
                 notificationStore.error(t('groups.errors.createFailed'));
             }
         }
     } catch (err) {
         console.error('Failed to save group:', err);
-        error.value = 'Failed to save group. Please try again.';
+        if (showEditGroupModal.value) {
+            notificationStore.error(t('groups.errors.updateFailed'));
+        } else {
+            notificationStore.error(t('groups.errors.createFailed'));
+        }
     } finally {
         modalLoading.value = false;
     }

@@ -29,10 +29,8 @@ export interface Event {
     groupId: string;
     createdBy: string; // User ID
     background?: string; // URL to the event's background image
-    // New fields to support single vs multiple person events
-    scope?: 'single' | 'multiple';
-    // For single-person events, the intended person (a User.id in the group)
-    targetPersonId?: string;
+    // Members of the event with basic info and target flag
+    members?: (User & { isTarget?: boolean })[];
 }
 
 // Gift model

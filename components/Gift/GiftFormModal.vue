@@ -3,7 +3,7 @@
     <template #header>
       <div class="flex items-center gap-3">
         <div class="shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
-          <Icon name="mdi:gift-outline" class="h-6 w-6 text-indigo-600" />
+          <NuxtIcon name="mdi:gift-outline" class="h-6 w-6 text-indigo-600" />
         </div>
         <h3 class="text-lg leading-6 font-medium text-gray-900">{{ gift ? 'Edit Gift' : 'Add New Gift' }}</h3>
       </div>
@@ -20,7 +20,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
 import type { Gift } from '~/types';
 import BaseModal from '~/components/ui/BaseModal.vue'
 

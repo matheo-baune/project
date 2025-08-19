@@ -10,17 +10,6 @@ export default defineNuxtConfig({
     }
   },
 
-  // Global CSS (Tailwind entry)
-  css: ['~/assets/css/tailwind.css'],
-
-  // PostCSS configuration for Tailwind (no Nuxt Tailwind module)
-  postcss: {
-    plugins: {
-      '@tailwindcss/postcss': {},
-      autoprefixer: {},
-    },
-  },
-
   // Modules required for the gift list application (without @nuxtjs/tailwindcss)
   modules: [
     '@nuxt/image',
@@ -30,6 +19,44 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@nuxt/ui',
   ],
+
+  // Application configuration
+  app: {
+    head: {
+      title: 'Gift List Manager',
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: 'https://nuxt.com/assets/design-kit/icon-white.png' },
+      ],
+      meta: [
+        { name: 'description', content: 'A gift list management application for groups' }
+      ],
+    }
+  },
+
+  // TypeScript configuration
+  typescript: {
+    strict: true,
+  },
+
+  // Global CSS (Tailwind entry)
+  css: ['~/assets/css/tailwind.css'],
+
+  // Google Fonts configuration
+  googleFonts: {
+    families: {
+      Inter: [400, 500, 600, 700],
+      Poppins: [400, 500, 600, 700],
+    },
+    display: 'swap',
+  },
+
+  // PostCSS configuration for Tailwind (no Nuxt Tailwind module)
+  postcss: {
+    plugins: {
+      '@tailwindcss/postcss': {},
+      autoprefixer: {},
+    },
+  },
 
   // i18n configuration
   i18n: {
@@ -54,30 +81,10 @@ export default defineNuxtConfig({
     },
   },
 
-  // Google Fonts configuration
-  googleFonts: {
-    families: {
-      Inter: [400, 500, 600, 700],
-      Poppins: [400, 500, 600, 700],
-    },
-    display: 'swap',
-  },
-
-  // TypeScript configuration
-  typescript: {
-    strict: true,
-  },
-
-  // Application configuration
-  app: {
-    head: {
-      title: 'Gift List Manager',
-      link: [
-        { rel: 'icon', type: 'image/x-icon', href: 'https://nuxt.com/assets/design-kit/icon-white.png' },
-      ],
-      meta: [
-        { name: 'description', content: 'A gift list management application for groups' }
-      ],
+  icon: {
+    componentName: 'NuxtIcon',
+    serverBundle: {
+      collections: ['heroicons']
     }
   }
 })

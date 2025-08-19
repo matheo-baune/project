@@ -8,7 +8,7 @@
         <template #header>
             <div class="flex items-center gap-3">
                 <div class="shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                    <Icon name="heroicons-outline:calendar" class="h-6 w-6 text-indigo-600"/>
+                    <NuxtIcon name="heroicons-outline:calendar" class="h-6 w-6 text-indigo-600"/>
                 </div>
                 <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
                     {{ modalTitle }}
@@ -66,9 +66,9 @@
                             </label>
                         </div>
                         <USelectMenu
-                            v-model="targetSelected"
-                            :items="membersCombobox"
+                            v-model="targetsSelected"
                             multiple
+                            :items="membersCombobox"
                             class="w-full"
                             :teleport="false"
                             :disabled="allTargets"
@@ -77,28 +77,47 @@
                         />
                     </div>
 
-                    <div class="mt-4 relative z-[60]">
-                        <div class="flex items-center justify-between mb-2">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ t('events.selectParticipants') }}</label>
-                            <label class="text-xs inline-flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" v-model="selectAll" @change="toggleSelectAll">
-                                {{ t('common.selectAll')}}
-                            </label>
-                        </div>
+                    <div class="mt-4">
+                        <label class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ t('events.selectParticipants') }}</label>
                         <USelectMenu
-                            name="selectParticipant"
-                            id="selectParticipant"
-                            v-model="participantsSelected"
-                            multiple
+                            v-model="participantToAdd"
+                            :items="availableMembersToAdd"
                             searchable
-                            :items="membersComboboxWithDisabled"
-                            class="w-full"
+                            class="w-full mt-2"
                             :teleport="false"
                             :popper="{ strategy: 'fixed', placement: 'bottom-start' }"
+                            :disabled="allTargets"
+                            placeholder="Rechercher un membre..."
                         />
-                        <p v-if="participantsSelected.length" class="mt-1 text-xs text-gray-500">
-                            {{ participantsSelected.length }} {{ t('common.selected')}}
-                        </p>
+                        <ul class="mt-3 space-y-2 max-h-60 overflow-auto pr-1">
+                            <li
+                                v-for="item in participantsSelected"
+                                :key="item.value"
+                                class="flex items-center justify-between bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700 rounded-md px-2 py-1"
+                            >
+                                <div class="flex items-center gap-2">
+                                    <img v-if="item.avatar?.src" :src="item.avatar.src" :alt="item.avatar?.alt || item.label" class="h-6 w-6 rounded-full object-cover"/>
+                                    <div v-else class="h-6 w-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-semibold">
+                                        {{ item.label?.[0] }}
+                                    </div>
+                                    <span class="text-sm">{{ item.label }}</span>
+                                    <span
+                                        v-if="isTarget(item.value)"
+                                        class="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300"
+                                    >
+                                        {{ t('events.targetPerson') }}
+                                    </span>
+                                </div>
+                                <button
+                                    class="text-red-600 hover:text-red-800 disabled:text-gray-400"
+                                    :disabled="allTargets || isTarget(item.value)"
+                                    @click.prevent="removeParticipant(item.value)"
+                                    title="Remove"
+                                >
+                                    <NuxtIcon name="heroicons-outline:x-mark" class="h-5 w-5"/>
+                                </button>
+                            </li>
+                        </ul>
                     </div>
                 </div>
 
@@ -135,7 +154,7 @@
             <UiButton form="event-form" type="submit" variant="primary"
                       :disabled="loading || !localForm.name || !localForm.date">
                 <template #icon>
-                    <Icon v-if="loading" name="line-md:loading-twotone-loop"
+                    <NuxtIcon v-if="loading" name="line-md:loading-twotone-loop"
                           class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"/>
                 </template>
                 {{ submitText }}
@@ -154,12 +173,17 @@ import {useI18n} from 'vue-i18n'
 import BaseModal from '~/components/ui/BaseModal.vue'
 import UiButton from '~/components/ui/UiButton.vue'
 
+interface EventMemberEntry {
+    id: string
+    isTarget: boolean
+}
+
 interface EventLike {
     id?: string
     name: string
     date: string
     background?: string
-    targetPersonId?: string
+    members?: EventMemberEntry[]
 }
 
 interface MemberLike {
@@ -205,48 +229,60 @@ const localForm = reactive<EventLike>({
     id: props.initialEvent?.id,
     name: props.initialEvent?.name || '',
     date: props.initialEvent?.date ? normalizeDate(props.initialEvent.date) : today(),
-
     background: props.initialEvent?.background || '',
-    targetPersonId: props.initialEvent?.targetPersonId
+    members: Array.isArray(props.initialEvent?.members)
+        ? [...(props.initialEvent?.members as EventMemberEntry[])]
+        : [],
 })
 
 // Target and participants selection state (front-end only for now)
-const targetSelected = ref<SelectMenuItem | null>(null)
+const targetsSelected = ref<SelectMenuItem[]>([])
 const participantsSelected = ref<SelectMenuItem[]>([])
-const selectAll = ref(false)
+const participantToAdd = ref<SelectMenuItem | null>(null)
 const allTargets = ref(false)
 
-const membersComboboxWithDisabled = computed<SelectMenuItem[]>(() =>
-    membersCombobox.value.map(item => ({
-        ...item,
-        disabled: localForm.targetPersonId === item.value
-    }))
+const availableMembersToAdd = computed<SelectMenuItem[]>(() =>
+    membersCombobox.value.filter(item => !participantsSelected.value.some(p => p.value === item.value))
 )
 
 watch(allTargets, (val) => {
     if (val) {
-        // Everyone is a target: no single target person
-        targetSelected.value = null
-        localForm.targetPersonId = undefined
+        // Everyone is a target: ignore individual targets
+        targetsSelected.value = []
+        // targets list controlled by targetsSelected/allTargets; members built on submit
+        // Everyone participates and cannot be edited via the list
+        participantsSelected.value = [...membersCombobox.value]
+    } else {
+        // When disabling allTargets, ensure all selected targets are in participants
+        ensureTargetsInParticipants()
     }
 })
 
-const allMembersItems = computed(() => membersCombobox.value)
-function toggleSelectAll() {
-    if (selectAll.value) {
-        participantsSelected.value = [...allMembersItems.value]
-    } else {
-        // Keep the concerned person if selected
-        participantsSelected.value = targetSelected.value ? [targetSelected.value] : []
+function addParticipant(item: SelectMenuItem) {
+    if (!participantsSelected.value.find(i => i.value === item.value)) {
+        participantsSelected.value = [...participantsSelected.value, item]
     }
 }
 
-function ensureTargetInParticipants() {
-    if (targetSelected.value) {
-        const id = targetSelected.value.value
-        if (!participantsSelected.value.find(i => i.value === id)) {
-            participantsSelected.value = [...participantsSelected.value, targetSelected.value]
-        }
+function isTarget(id: string | number) {
+    const sid = String(id)
+    if (allTargets.value) return true
+    return Array.isArray(targetsSelected.value) && targetsSelected.value.some(i => String(i.value) === sid)
+}
+
+function removeParticipant(id: string | number) {
+    if (allTargets.value) return
+    if (isTarget(id)) return
+    participantsSelected.value = participantsSelected.value.filter(i => String(i.value) !== String(id))
+    ensureTargetsInParticipants()
+}
+
+function ensureTargetsInParticipants() {
+    if (!targetsSelected.value?.length) return
+    const currentIds = new Set(participantsSelected.value.map(i => String(i.value)))
+    const toAdd = targetsSelected.value.filter(t => !currentIds.has(String(t.value)))
+    if (toAdd.length) {
+        participantsSelected.value = [...participantsSelected.value, ...toAdd]
     }
 }
 
@@ -256,15 +292,24 @@ watch(() => props.modelValue, (open) => {
         localForm.name = props.initialEvent?.name || ''
         localForm.date = props.initialEvent?.date ? normalizeDate(props.initialEvent.date) : today()
         localForm.background = props.initialEvent?.background || ''
-        localForm.targetPersonId = props.initialEvent?.targetPersonId
-        // reset selections on open
-        selectAll.value = false
-        // derive allTargets from initial form data
-        allTargets.value = !localForm.targetPersonId
-        // set targetSelected from form
-        targetSelected.value = membersCombobox.value.find(i => i.value === localForm.targetPersonId) || null
-        // initialize participants keeping target if any
-        participantsSelected.value = targetSelected.value ? [targetSelected.value] : []
+        localForm.members = Array.isArray(props.initialEvent?.members)
+            ? [...(props.initialEvent?.members as EventMemberEntry[])]
+            : []
+        // do not auto-toggle allTargets; default to off unless user checks it
+        allTargets.value = false
+        // set targetsSelected from members marked as target
+        const targetIds = new Set((localForm.members || []).filter(m => m.isTarget).map(m => String(m.id)))
+        targetsSelected.value = membersCombobox.value.filter(i => targetIds.has(String(i.value)))
+        // initialize participants based on mode: start from any members in the list if provided, else from targets
+        const existingParticipantIds = new Set((localForm.members || []).map(m => String(m.id)))
+        if (allTargets.value) {
+            participantsSelected.value = [...membersCombobox.value]
+        } else if (existingParticipantIds.size) {
+            participantsSelected.value = membersCombobox.value.filter(i => existingParticipantIds.has(String(i.value)))
+            ensureTargetsInParticipants()
+        } else {
+            participantsSelected.value = [...targetsSelected.value]
+        }
     }
 })
 
@@ -274,32 +319,74 @@ watch(() => props.initialEvent, (val) => {
         localForm.name = val?.name || ''
         localForm.date = val?.date ? normalizeDate(val.date) : today()
         localForm.background = val?.background || ''
-        localForm.targetPersonId = val?.targetPersonId
-        // sync allTargets and target selection
-        allTargets.value = !localForm.targetPersonId
-        targetSelected.value = membersCombobox.value.find(i => i.value === localForm.targetPersonId) || null
-        // make sure target is included in participants
-        ensureTargetInParticipants()
+        localForm.members = Array.isArray(val?.members)
+            ? [...(val?.members as EventMemberEntry[])]
+            : []
+        // keep allTargets as-is; set targetsSelected based on members marked as target
+        const targetIds = new Set((localForm.members || []).filter(m => m.isTarget).map(m => String(m.id)))
+        targetsSelected.value = membersCombobox.value.filter(i => targetIds.has(String(i.value)))
+        // sync participants
+        if (allTargets.value) {
+            participantsSelected.value = [...membersCombobox.value]
+        } else {
+            // Prefer members list provided; otherwise ensure targets are included
+            const existingParticipantIds = new Set((localForm.members || []).map(m => String(m.id)))
+            if (existingParticipantIds.size) {
+                participantsSelected.value = membersCombobox.value.filter(i => existingParticipantIds.has(String(i.value)))
+            }
+            ensureTargetsInParticipants()
+        }
     }
 }, {deep: true})
 
 const modalTitle = computed(() => props.title || (mode.value === 'edit' ? (t('events.editEvent') || 'Edit Event') : (t('events.createEvent') || 'Create Event')))
 const submitText = computed(() => props.submitLabel || (mode.value === 'edit' ? (t('events.updateEvent') || 'Update Event') : (t('events.createEvent') || 'Create Event')))
 
-// Keep localForm.targetPersonId in sync with targetSelected
-watch(targetSelected, (item) => {
-    localForm.targetPersonId = item ? String(item.value) : undefined
-    ensureTargetInParticipants()
+// Keep UI in sync when targets change
+watch(targetsSelected, () => {
+    ensureTargetsInParticipants()
 })
 
-// Prevent removing the target from participants
-watch(participantsSelected, () => {
-    ensureTargetInParticipants()
+// Add participant from autocomplete then clear it
+watch(participantToAdd, (item) => {
+    if (item) {
+        addParticipant(item)
+        participantToAdd.value = null
+    }
+})
+
+// Prevent removing the target from participants and lock when allTargets
+watch(participantsSelected, (newVal) => {
+    if (allTargets.value) {
+        const desired = membersCombobox.value
+        const isSame = newVal.length === desired.length && newVal.every((item, idx) => String(item.value) === String(desired[idx].value))
+        if (!isSame) {
+            participantsSelected.value = [...desired]
+        }
+        return
+    }
+    ensureTargetsInParticipants()
 })
 
 function onSubmit() {
     if (!localForm.name || !localForm.date) return
-    emit('submit', {...localForm})
+    // Build members array: list of participants with isTarget flag
+    let members: EventMemberEntry[]
+    if (allTargets.value) {
+        members = (props.members || []).map(m => ({ id: String(m.id), isTarget: true }))
+    } else {
+        const targetIdSet = new Set(targetsSelected.value.map(i => String(i.value)))
+        const participantIdSet = new Set(participantsSelected.value.map(i => String(i.value)))
+        members = Array.from(participantIdSet).map(id => ({ id, isTarget: targetIdSet.has(id) }))
+    }
+    const payload: EventLike = {
+        id: localForm.id,
+        name: localForm.name,
+        date: localForm.date,
+        background: localForm.background,
+        members
+    }
+    emit('submit', payload)
 }
 
 function onCancel() {

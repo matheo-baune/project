@@ -3,7 +3,7 @@ import db from "~/server/db";
 export default defineEventHandler(async (event) => {
     // Create a new event
     const body = await readBody(event);
-    const { name, date, groupId, createdBy, scope, targetPersonId } = body;
+    const { name, date, groupId, createdBy, background, members } = body;
     
     // Validate required fields
     if (!name || !date || !groupId || !createdBy) {
@@ -29,22 +29,49 @@ export default defineEventHandler(async (event) => {
         }
 
         // Insert the new event into the database
-        const result = await db.query(
-            `INSERT INTO events (name, date, group_id, created_by) 
-             VALUES ($1, $2, $3, $4) 
+        const resultEvent = await db.query(
+            `INSERT INTO events (name, date, group_id, created_by, background) 
+             VALUES ($1, $2, $3, $4, $5) 
              RETURNING *`,
-            [name, date, groupId, createdBy]
+            [name, date, groupId, createdBy, background]
         );
 
-        const created = result.rows[0];
+
+        //Create link between members and event
+        for (const member of members) {
+            await db.query(`INSERT INTO event_members (event_id, user_id, is_target) VALUES ($1, $2, $3)`, [resultEvent.rows[0].id, member.id, member.isTarget]);
+        }
+
+
+        const eventCreated = resultEvent.rows[0];
+
+        // Enrich members with basic user info
+        const memberIds = (members || []).map((m: any) => parseInt(m.id, 10)).filter((n: number) => !isNaN(n))
+        let enrichedMembers: any[] = []
+        if (memberIds.length) {
+            const usersRes = await db.query(
+                `SELECT id, firstname, lastname, avatar FROM users WHERE id = ANY($1::int[])`,
+                [memberIds]
+            )
+            const targetMap = new Map<string, boolean>(members.map((m: any) => [String(m.id), !!m.isTarget]))
+            enrichedMembers = usersRes.rows.map((u: any) => ({
+                id: u.id.toString(),
+                firstname: u.firstname,
+                lastname: u.lastname,
+                avatar: u.avatar || undefined,
+                isTarget: !!targetMap.get(u.id.toString())
+            }))
+        }
 
         // Format the response
         return {
-            id: created.id.toString(),
-            name: created.name,
-            date: created.date,
-            groupId: created.group_id.toString(),
-            createdBy: created.created_by.toString(),
+            id: eventCreated.id.toString(),
+            name: eventCreated.name,
+            date: eventCreated.date,
+            groupId: eventCreated.group_id.toString(),
+            createdBy: eventCreated.created_by.toString(),
+            background: eventCreated.background,
+            members: enrichedMembers
         };
     } catch (error) {
         console.error('Error creating event:', error);

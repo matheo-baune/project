@@ -1,5 +1,4 @@
 import { Pool } from 'pg';
-import { convertKeysToCamelCase } from '../utils/caseConversion';
 
 // Create a new Pool instance with connection details
 const pool = new Pool({
@@ -24,15 +23,8 @@ pool.on('error', (err) => {
 export const query = async (text: string, params?: any[]) => {
   const start = Date.now();
   try {
-    const res = await pool.query(text, params);
-    const duration = Date.now() - start;
+    const res = pool.query(text, params);
     console.log('Executed query', text);
-
-    // Convert snake_case keys to camelCase
-    if (res.rows && res.rows.length > 0) {
-      res.rows = convertKeysToCamelCase(res.rows);
-    }
-
     return res;
   } catch (error) {
     console.error('Error executing query', { text, error });

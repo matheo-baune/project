@@ -1,0 +1,98 @@
+<template>
+  <div class="overflow-hidden shadow-sm rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md dark:bg-gray-800 dark:border-gray-700" @click="$emit('click', group)">
+    <div class="relative px-4 py-5 sm:p-6 bg-cover bg-center" :style="backgroundStyle">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg leading-6 font-medium text-white" style="text-shadow: 0 1px 3px rgba(0,0,0,0.6);">
+            {{ group.name }}
+          </h3>
+          <p class="mt-1 text-sm text-white text-opacity-90" style="text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
+            {{ group.members.length }} members
+          </p>
+        </div>
+        <div class="flex -space-x-2 overflow-hidden">
+          <template v-for="(member, index) in displayMembers" :key="member.id">
+            <div class="inline-block h-8 w-8 rounded-full overflow-hidden" :title="member.name">
+              <img v-if="member.avatar" :src="member.avatar" alt="Member avatar" class="h-full w-full object-cover" />
+              <div v-else class="h-full w-full flex items-center justify-center bg-indigo-100 text-indigo-800 font-semibold text-xs">
+                {{ getMemberInitials(member) }}
+              </div>
+            </div>
+          </template>
+          <div v-if="group.members.length > maxDisplayMembers" class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-semibold text-xs" :title="remainingMembersNames">
+            +{{ group.members.length - maxDisplayMembers }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-gray-50 px-4 py-4 sm:px-6 dark:bg-gray-800 dark:text-white">
+      <div class="flex justify-between">
+        <NuxtLink :to="`/groups/${group.id}`" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600" @click.stop>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          View Events
+        </NuxtLink>
+        <div class="flex space-x-2" v-if="group.created_by === currentUser?.id">
+          <button @click.stop="$emit('edit', group)" class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600">
+            <NuxtIcon name="fa-regular:edit" size="1.2em" class="me-1" />
+            {{ t('common.edit') }}
+          </button>
+          <button @click.stop="$emit('delete', group.id)" class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-red-700 bg-white hover:bg-red-50 dark:bg-gray-700 dark:text-red-400 dark:border-gray-600 dark:hover:bg-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            {{ t('common.delete') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { Group, User } from '~/types'
+import { useUserStore } from '~/stores'
+
+const props = defineProps<{ group: Group }>()
+const emit = defineEmits<{ (e: 'click', group: Group): void; (e: 'edit', group: Group): void; (e: 'delete', id: string): void }>()
+
+const { t } = useI18n()
+
+const userStore = useUserStore()
+const currentUser = computed(() => userStore.currentUser)
+
+const maxDisplayMembers = 3
+const displayMembers = computed(() => props.group.members.slice(0, maxDisplayMembers))
+const remainingMembersNames = computed(() => props.group.members.slice(maxDisplayMembers).map(m => `${m.firstname} ${m.lastname}`).join(', '))
+
+const backgroundImages = {
+  family: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+  friends: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+  work: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+  default: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+}
+
+const backgroundStyle = computed(() => {
+  if (props.group.background) {
+    return { backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url(${props.group.background})` }
+  }
+  const groupNameLower = props.group.name.toLowerCase()
+  let backgroundImage = backgroundImages.default
+  if (groupNameLower.includes('family')) backgroundImage = backgroundImages.family
+  else if (groupNameLower.includes('friend')) backgroundImage = backgroundImages.friends
+  else if (groupNameLower.includes('work') || groupNameLower.includes('colleague')) backgroundImage = backgroundImages.work
+  return { backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url(${backgroundImage})` }
+})
+
+function getMemberInitials(user: User) {
+  if (!user?.firstname) return '?'
+  const firstNamePart = user.firstname.charAt(0).toUpperCase()
+  const lastNamePart = user.lastname.charAt(0).toUpperCase()
+  return firstNamePart + lastNamePart
+}
+</script>

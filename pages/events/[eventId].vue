@@ -1,33 +1,24 @@
 <template>
     <div>
-
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Loading state -->
             <div v-if="loading" class="py-12 flex justify-center">
                 <UiLoader size="lg" color="text-indigo-600" :label="t('common.loading')"/>
             </div>
 
-            <!-- Error state -->
-            <div v-else-if="error" class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-                <div class="flex">
-                    <div class="shrink-0">
-                        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                             fill="currentColor" aria-hidden="true">
-                            <path fill-rule="evenodd"
-                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                  clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm text-red-700">
-                            {{ error }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-
             <!-- Event content -->
             <div v-else>
+                <!-- Event background banner -->
+                <div v-if="event?.background"
+                     class="mb-4 relative rounded-lg overflow-hidden border border-gray-200">
+                    <img :src="event?.background" alt="Event background" class="w-full h-40 object-cover" />
+                    <div class="absolute inset-0 bg-gradient-to-b from-black/30 to-black/60"></div>
+                    <div class="absolute inset-0 flex items-center justify-center text-center px-4">
+                        <h1 class="text-white text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-xl">
+                            {{ event?.name }}
+                        </h1>
+                    </div>
+                </div>
                 <!-- Event header -->
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
                     <div>
@@ -74,7 +65,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-4">
                       <h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ t('gifts.title') }}</h2>
-                      <UiButton v-if="canAddGift" variant="primary" @click="openCreateGift">
+                      <UiButton v-if="activeTab === 'mine'" variant="primary" @click="openCreateGift">
                         <template #icon>
                           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -84,20 +75,24 @@
                       </UiButton>
                     </div>
 
-                    <!-- Empty state -->
-                    <EmptyStateCard v-if="displayedGifts.length === 0"
-                                    :title="t('gifts.emptyTitle')"
-                                    :description="t('gifts.emptyDescriptionForEvent')"
-                                    :actionLabel="t('gifts.addGifts')">
+                    <!-- Tabs: show Others only if there are other members -->
+                    <div class="mb-4">
+                      <UTabs v-model="activeTab" :items="tabItems" :ui="{ list: { base: 'w-full' } }" />
+                    </div>
+
+                    <!-- Mine tab content -->
+                    <div v-if="activeTab === 'mine'">
+                      <EmptyStateCard v-if="yourGifts.length === 0"
+                                      :title="t('gifts.emptyTitle')"
+                                      :description="t('gifts.emptyDescriptionForEvent')"
+                                      :actionLabel="t('gifts.addGifts')">
                         <template #icon>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none"
-                                 viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
-                            </svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+                          </svg>
                         </template>
                         <template #action>
-                          <UiButton v-if="canAddGift" variant="primary" @click="openCreateGift">
+                          <UiButton variant="primary" @click="openCreateGift">
                             <template #icon>
                               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -106,51 +101,58 @@
                             {{ t('gifts.addGifts') }}
                           </UiButton>
                         </template>
-                    </EmptyStateCard>
+                      </EmptyStateCard>
 
-                    <!-- Gifts content -->
-                    <div v-else>
-                      <!-- Single-person event -->
-                      <div v-if="event?.scope === 'single'">
-                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                          <GiftCard
-                            v-for="gift in displayedGifts"
-                            :key="gift.id"
-                            :gift="gift"
-                            @reserve="handleReserveGift"
-                            @cancel-reservation="handleCancelReservation"
-                            @edit="openEditGift"
-                            @delete="handleDeleteGift"
-                            @comments="openComments"
-                          />
-                        </div>
+                      <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <GiftCard
+                          v-for="gift in yourGifts"
+                          :key="gift.id"
+                          :gift="gift"
+                          @reserve="handleReserveGift"
+                          @cancel-reservation="handleCancelReservation"
+                          @edit="openEditGift"
+                          @delete="handleDeleteGift"
+                          @comments="openComments"
+                        />
                       </div>
+                    </div>
 
-                      <!-- Multiple-person event -->
-                      <div v-else>
-                        <!-- Your gifts -->
-                        <div v-if="yourGifts.length">
-                          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ t('gifts.yourGifts') }}</h3>
-                          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-6">
-                            <GiftCard
-                              v-for="gift in yourGifts"
-                              :key="gift.id"
-                              :gift="gift"
-                              @reserve="handleReserveGift"
-                              @cancel-reservation="handleCancelReservation"
-                              @edit="openEditGift"
-                              @delete="handleDeleteGift"
-                              @comments="openComments"
-                            />
-                          </div>
+                    <!-- Others tab content -->
+                    <div v-else>
+                      <div class="flex flex-col lg:flex-row gap-4">
+                        <!-- Members list -->
+                        <div class="lg:w-1/4 w-full bg-white dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
+                          <div class="px-3 py-2 border-b border-gray-100 dark:border-gray-700 text-sm font-medium">{{ t('gifts.members') || 'Members' }}</div>
+                          <ul class="max-h-80 overflow-auto">
+                            <li v-for="m in otherMembers" :key="m.id">
+                              <button
+                                class="w-full text-left px-3 py-2 flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                :class="selectedMemberId === m.id ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700' : ''"
+                                @click="selectedMemberId = m.id"
+                              >
+                                <img v-if="m.avatar" :src="m.avatar" :alt="m.firstname + ' ' + m.lastname" class="h-6 w-6 rounded-full object-cover" />
+                                <div v-else class="h-6 w-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-semibold">
+                                  {{ (m.firstname || m.username)?.[0] }}
+                                </div>
+                                <span class="text-sm">{{ m.firstname }} {{ m.lastname }}</span>
+                              </button>
+                            </li>
+                          </ul>
                         </div>
-
-                        <!-- Others' gifts -->
-                        <div>
-                          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ t('gifts.othersGifts') }}</h3>
-                          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <!-- Gifts grid for selected member -->
+                        <div class="flex-1">
+                          <EmptyStateCard v-if="selectedMemberGifts.length === 0"
+                                          :title="t('gifts.emptyTitle')"
+                                          :description="t('gifts.emptyDescriptionForEvent')">
+                            <template #icon>
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+                              </svg>
+                            </template>
+                          </EmptyStateCard>
+                          <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                             <GiftCard
-                              v-for="gift in othersGifts"
+                              v-for="gift in selectedMemberGifts"
                               :key="gift.id"
                               :gift="gift"
                               @reserve="handleReserveGift"
@@ -175,14 +177,6 @@
             @reserve="confirmReserveGift"
         />
 
-        <!-- Comments Modal -->
-        <CommentsModal
-            :is-open="showCommentsModal"
-            :gift-id="commentsGift?.id"
-            :gift-title="commentsGift?.title"
-            @close="showCommentsModal = false"
-        />
- 
          <!-- Gift Create/Edit Modal -->
         <GiftFormModal
             :is-open="showGiftModal"
@@ -206,20 +200,20 @@
         />
 
     </div>
+    {{event}}
 </template>
 
 <script setup lang="ts">
-import {ref, computed, onMounted} from 'vue';
+import {ref, computed, onMounted, watch} from 'vue';
 import {useI18n} from 'vue-i18n'
 import {useRoute, useRouter} from 'vue-router';
-import type {Event, Gift} from '~/types';
+import type {Event, Gift, User} from '~/types';
 import {useUserStore, useEventStore, useGiftStore} from '~/stores';
-import EventModal from '~/components/event/EventModal.vue';
+import EventModal from '~/components/Event/EventModal.vue';
 import EmptyStateCard from "~/components/ui/EmptyStateCard.vue";
 import UiButton from "~/components/ui/UiButton.vue";
-import GiftFormModal from "~/components/gift/GiftFormModal.vue";
-import GiftCard from "~/components/gift/GiftCard.vue";
-import CommentsModal from "~/components/gift/CommentsModal.vue";
+import GiftFormModal from "~/components/Gift/GiftFormModal.vue";
+import GiftCard from "~/components/Gift/GiftCard.vue";
 import {useNotificationStore} from '~/stores';
 
 const route = useRoute();
@@ -233,9 +227,26 @@ const eventId = route.params.eventId as string;
 
 // State
 const loading = ref(true);
-const error = ref('');
 const event = ref<Event | null>(null);
 const gifts = ref<Gift[]>([]);
+
+// Group members for the "Others" tab
+const groupMembers = ref<User[]>([]);
+const otherMembers = computed(() => (groupMembers.value || []).filter(m => m.id !== (currentUserId.value || '')));
+
+// Tabs state
+const activeTab = ref<'mine' | 'others'>('mine');
+const tabItems = computed(() => {
+    const items = [{ label: t('gifts.yourGifts') || 'My gifts', slot: 'mine', content: 'mine', value: 'mine' }];
+    if (otherMembers.value.length > 0) {
+        items.push({ label: t('gifts.othersGifts') || 'Others', slot: 'others', content: 'others', value: 'others' });
+    }
+    return items;
+});
+
+// Selected member in Others tab
+const selectedMemberId = ref<string | null>(null);
+const selectedMemberGifts = computed(() => selectedMemberId.value ? gifts.value.filter(g => g.createdBy === selectedMemberId.value) : []);
 
 // Reservation state
 const showReservationModal = ref(false);
@@ -267,31 +278,11 @@ const formattedDate = computed(() => {
     }).format(date);
 });
 
-// Check if the current user is the creator of the event
-const isCreator = computed(() => {
-    return userStore.user?.id === event.value?.createdBy;
-});
-
 // Computed lists for UI logic
 const currentUserId = computed(() => userStore.currentUser?.id || userStore.user?.id)
-const isTargetPerson = computed(() => event.value?.scope === 'single' && currentUserId.value && event.value?.targetPersonId === currentUserId.value)
 
 const yourGifts = computed(() => gifts.value.filter(g => g.createdBy === (currentUserId.value || '')))
-const targetGifts = computed(() => event.value?.targetPersonId ? gifts.value.filter(g => g.createdBy === event.value!.targetPersonId) : gifts.value)
-const othersGifts = computed(() => gifts.value.filter(g => g.createdBy !== (currentUserId.value || '')))
-const displayedGifts = computed(() => {
-    if (event.value?.scope === 'single') {
-        return isTargetPerson.value ? yourGifts.value : targetGifts.value
-    }
-    return gifts.value
-})
 
-const canAddGift = computed(() => {
-    if (event.value?.scope === 'single') {
-        return isTargetPerson.value
-    }
-    return true
-})
 
 // Initialize the page
 onMounted(async () => {
@@ -302,7 +293,6 @@ onMounted(async () => {
     }
 
     await fetchEvent();
-    await fetchGifts();
 
     useHead({
         title: `Wishlist - ${event.value?.name || ''}`
@@ -312,7 +302,6 @@ onMounted(async () => {
 // Fetch event
 const fetchEvent = async () => {
     loading.value = true;
-    error.value = '';
 
     try {
         const fetchedEvent = await eventStore.fetchEvent(eventId);
@@ -320,29 +309,48 @@ const fetchEvent = async () => {
         if (fetchedEvent) {
             event.value = fetchedEvent;
         } else {
-            error.value = eventStore.error || 'Event not found';
+            notificationStore.error(eventStore.error || 'Event not found');
         }
     } catch (err) {
         console.error('Failed to fetch event:', err);
-        error.value = 'Failed to load event. Please try again.';
+        notificationStore.error('Failed to load event. Please try again.');
     } finally {
         loading.value = false;
     }
 };
+
+// Fetch group members for the event's group
+const fetchGroupMembers = async () => {
+    const gid = event.value?.groupId
+    if (!gid) return
+    try {
+        const res = await fetch(`/api/groups/${gid}`)
+        if (!res.ok) return
+        const group = await res.json()
+        groupMembers.value = Array.isArray(group.members) ? group.members : []
+        // Default selected member: first other member who has gifts, else first other member
+        const giftCreators = new Set(gifts.value.filter(g => g.createdBy !== (currentUserId.value || '')).map(g => g.createdBy))
+        const preferred = (groupMembers.value || []).find(m => m.id !== (currentUserId.value || '') && giftCreators.has(m.id))
+        const fallback = (groupMembers.value || []).find(m => m.id !== (currentUserId.value || ''))
+        selectedMemberId.value = preferred?.id || fallback?.id || null
+    } catch (e) {
+        // Silent fail; members list is optional for this UI
+        console.warn('Failed to fetch group members', e)
+    }
+}
 
 // Fetch gifts
 const fetchGifts = async () => {
     if (!eventId) return;
 
     loading.value = true;
-    error.value = '';
 
     try {
         const fetchedGifts = await giftStore.fetchGiftsByEventId(eventId);
         gifts.value = fetchedGifts;
     } catch (err) {
         console.error('Failed to fetch gifts:', err);
-        error.value = 'Failed to load gifts. Please try again.';
+        notificationStore.error('Failed to load gifts. Please try again.');
     } finally {
         loading.value = false;
     }
@@ -366,10 +374,21 @@ const closeGiftModal = () => {
     editingGift.value = null;
 };
 
+// Keep selectedMemberId coherent when data changes
+watch(otherMembers, (list) => {
+    if (!list.find(m => m.id === selectedMemberId.value)) {
+        selectedMemberId.value = list[0]?.id || null
+    }
+})
+watch(activeTab, (tab) => {
+    if (tab === 'others' && !selectedMemberId.value && otherMembers.value.length) {
+        selectedMemberId.value = otherMembers.value[0].id
+    }
+})
+
 // Create gift handler
 const handleCreateGift = async (giftData: Omit<Gift, 'id' | 'createdBy'>) => {
     loading.value = true;
-    error.value = '';
     try {
         const newGift = await giftStore.createGift(giftData);
         if (newGift) {
@@ -377,11 +396,11 @@ const handleCreateGift = async (giftData: Omit<Gift, 'id' | 'createdBy'>) => {
             notificationStore.success(t('gifts.createSuccess'));
             closeGiftModal();
         } else {
-            error.value = giftStore.error || t('gifts.errors.createFailed');
+            notificationStore.error(giftStore.error || t('gifts.errors.createFailed'));
         }
     } catch (e) {
         console.error('Failed to create gift:', e);
-        error.value = t('gifts.errors.createFailed');
+        notificationStore.error(t('gifts.errors.createFailed'));
     } finally {
         loading.value = false;
     }
@@ -390,7 +409,6 @@ const handleCreateGift = async (giftData: Omit<Gift, 'id' | 'createdBy'>) => {
 // Update gift handler
 const handleUpdateGift = async (id: string, updates: Partial<Omit<Gift, 'id' | 'createdBy' | 'eventId'>>) => {
     loading.value = true;
-    error.value = '';
     try {
         const updated = await giftStore.updateGift(id, updates);
         if (updated) {
@@ -399,11 +417,11 @@ const handleUpdateGift = async (id: string, updates: Partial<Omit<Gift, 'id' | '
             notificationStore.success(t('gifts.updateSuccess'));
             closeGiftModal();
         } else {
-            error.value = giftStore.error || t('gifts.errors.updateFailed');
+            notificationStore.error(giftStore.error || t('gifts.errors.updateFailed'));
         }
     } catch (e) {
         console.error('Failed to update gift:', e);
-        error.value = t('gifts.errors.updateFailed');
+        notificationStore.error(t('gifts.errors.updateFailed'));
     } finally {
         loading.value = false;
     }

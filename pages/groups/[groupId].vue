@@ -4,35 +4,27 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Loading state -->
             <div v-if="loading" class="flex justify-center items-center py-12">
-                <Icon name="line-md:loading-twotone-loop" class="animate-spin h-8 w-8 text-indigo-600"/>
-            </div>
-
-            <!-- Error state -->
-            <div v-else-if="error" class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-                <div class="flex">
-                    <div class="shrink-0">
-                        <Icon name="heroicons-solid:x-circle" class="h-5 w-5 text-red-400" aria-hidden="true"/>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm text-red-700">
-                            {{ error }}
-                        </p>
-                    </div>
-                </div>
+                <NuxtIcon name="line-md:loading-twotone-loop" class="animate-spin h-8 w-8 text-indigo-600"/>
             </div>
 
             <!-- Group content -->
             <div v-else>
                 <!-- Group background banner -->
-                <div v-if="group?.background" class="mb-4">
+                <div v-if="group?.background" class="mb-4 relative rounded-lg overflow-hidden border border-gray-200">
                     <img :src="group?.background" alt="Group background"
-                         class="w-full h-40 object-cover rounded-lg border border-gray-200"/>
+                         class="w-full h-40 object-cover"/>
+                    <div class="absolute inset-0 bg-gradient-to-b from-black/30 to-black/60"></div>
+                    <div class="absolute inset-0 flex items-center justify-center text-center px-4">
+                        <h1 class="text-white text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-xl">
+                            {{ group?.name }}
+                        </h1>
+                    </div>
                 </div>
                 <!-- Group header -->
                 <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
                     <div class="flex items-center">
                         <NuxtLink to="/dashboard" class="text-gray-400 hover:text-gray-600 mr-2">
-                            <Icon name="heroicons-outline:arrow-left" class="h-4 w-4"/>
+                            <NuxtIcon name="heroicons-outline:arrow-left" class="h-4 w-4"/>
                         </NuxtLink>
                         <h1 class="text-xl font-medium text-gray-900 dark:text-white">{{ group?.name }}</h1>
                         <span class="ml-2 text-xs text-gray-500">{{ group?.members.length }} members</span>
@@ -42,7 +34,7 @@
                             @click="showEditGroupModal = true"
                             class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
                         >
-                            <Icon name="fa-regular:edit" size="1.2em" class="me-1"/>
+                            <NuxtIcon name="fa-regular:edit" size="1.2em" class="me-1"/>
                         </button>
                         <button
                             @click="showCreateEventModal = true"
@@ -79,7 +71,7 @@
                                         </div>
                                         <div class="flex items-center gap-2">
                                             <span v-if="member.id === group?.createdBy" class="text-xs text-indigo-600"
-                                                  title="Creator"><Icon name="fa6-solid:crown" class="text-warning"
+                                                  title="Creator"><NuxtIcon name="fa6-solid:crown" class="text-warning"
                                                                         color="yellow"/></span>
                                             <button
                                                 v-if="currentUser?.id === group?.createdBy && member.id !==
@@ -88,7 +80,7 @@
                                                 title="Remove member"
                                                 @click="removeMemberInline(member.id)"
                                             >
-                                                <Icon name="heroicons-outline:x-mark" class="h-4 w-4"/>
+                                                <NuxtIcon name="heroicons-outline:x-mark" class="h-4 w-4"/>
                                             </button>
                                         </div>
                                     </div>
@@ -106,20 +98,12 @@
                             <div v-if="events.length > 0"
                                  class="flex items-center space-x-2 bg-white rounded-lg shadow-xs p-1 border border-gray-100">
                                 <button
-                                    @click="displayMode = 'small'"
-                                    class="p-1 rounded-sm"
-                                    :class="displayMode === 'small' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'"
-                                    title="Small grid view"
-                                >
-                                    <Icon name="heroicons-outline:view-grid" class="h-4 w-4"/>
-                                </button>
-                                <button
                                     @click="displayMode = 'card'"
                                     class="p-1 rounded-sm"
                                     :class="displayMode === 'card' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'"
                                     title="Card view"
                                 >
-                                    <Icon name="heroicons-outline:rectangle-stack" class="h-4 w-4"/>
+                                    <NuxtIcon name="heroicons-outline:rectangle-stack" class="h-4 w-4"/>
                                 </button>
                                 <button
                                     @click="displayMode = 'large'"
@@ -127,7 +111,7 @@
                                     :class="displayMode === 'large' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'"
                                     title="Large card view"
                                 >
-                                    <Icon name="heroicons-outline:view-columns" class="h-4 w-4"/>
+                                    <NuxtIcon name="heroicons-outline:view-columns" class="h-4 w-4"/>
                                 </button>
                             </div>
                         </div>
@@ -135,7 +119,7 @@
                         <!-- Empty state -->
                         <div v-if="events.length === 0"
                              class="bg-white border border-gray-100 rounded-lg p-4 text-center">
-                            <Icon name="heroicons-outline:calendar" class="h-8 w-8 mx-auto text-gray-400"/>
+                            <NuxtIcon name="heroicons-outline:calendar" class="h-8 w-8 mx-auto text-gray-400"/>
                             <h3 class="mt-2 text-sm font-medium text-gray-900">No events yet</h3>
                             <button
                                 @click="showCreateEventModal = true"
@@ -150,7 +134,6 @@
                              :class="{
               'grid gap-3': true,
               'grid-cols-1': true,
-              'sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4': displayMode === 'small',
               'sm:grid-cols-2 lg:grid-cols-3': displayMode === 'card',
               'sm:grid-cols-1 lg:grid-cols-2': displayMode === 'large',
             }"
@@ -198,7 +181,7 @@
                 <div class="flex items-center gap-3">
                     <div
                         class="mx-auto sm:mx-0 shrink-0 flex items-center justify-center h-10 w-10 rounded-full bg-red-100">
-                        <Icon name="heroicons-outline:exclamation-triangle" class="h-6 w-6 text-red-600"
+                        <NuxtIcon name="heroicons-outline:exclamation-triangle" class="h-6 w-6 text-red-600"
                               aria-hidden="true"/>
                     </div>
                     <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">Delete Event</h3>
@@ -214,7 +197,7 @@
                 <UiButton variant="primary" class="bg-red-600 hover:bg-red-700 focus:ring-red-500 mx-2"
                           :disabled="modalLoading" @click="confirmDeleteEvent">
                     <template #icon>
-                        <Icon v-if="modalLoading" name="line-md:loading-twotone-loop"
+                        <NuxtIcon v-if="modalLoading" name="line-md:loading-twotone-loop"
                               class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"/>
                     </template>
                     Delete
@@ -231,7 +214,7 @@
 import {ref, onMounted} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import type {Group, Event, User} from '~/types';
-import {useUserStore, useGroupStore, useEventStore} from '~/stores';
+import {useUserStore, useGroupStore, useEventStore, useNotificationStore} from '~/stores';
 import GroupModal from '~/components/group/GroupModal.vue';
 import BaseModal from "~/components/ui/BaseModal.vue";
 import UiButton from "~/components/ui/UiButton.vue";
@@ -242,6 +225,7 @@ const router = useRouter();
 const userStore = useUserStore();
 const groupStore = useGroupStore();
 const eventStore = useEventStore();
+const notificationStore = useNotificationStore();
 
 // Get the group ID from the route
 const groupId = route.params.groupId as string;
@@ -249,11 +233,10 @@ const groupId = route.params.groupId as string;
 
 // State
 const loading = ref(true);
-const error = ref('');
 const group = ref<Group>(null);
 const events = ref<Event[]>([]);
 const currentUser = ref(userStore.currentUser);
-const displayMode = ref<'card' | 'list' | 'small' | 'large'>('card');
+const displayMode = ref<'card' | 'large'>('card');
 
 // Modal state
 const showCreateEventModal = ref(false);
@@ -296,7 +279,6 @@ onMounted(async () => {
 // Fetch group
 const fetchGroup = async () => {
     loading.value = true;
-    error.value = '';
 
     try {
         const fetchedGroup = await groupStore.fetchGroup(groupId);
@@ -310,11 +292,11 @@ const fetchGroup = async () => {
                 members: [...fetchedGroup.members]
             };
         } else {
-            error.value = groupStore.error || 'Group not found';
+            notificationStore.error(groupStore.error || 'Group not found');
         }
     } catch (err) {
         console.error('Failed to fetch group:', err);
-        error.value = 'Failed to load group. Please try again.';
+        notificationStore.error('Failed to load group. Please try again.');
     } finally {
         loading.value = false;
     }
@@ -325,14 +307,13 @@ const fetchEvents = async () => {
     if (!groupId) return;
 
     loading.value = true;
-    error.value = '';
 
     try {
         const fetchedEvents = await eventStore.fetchEventsByGroupId(groupId);
         events.value = fetchedEvents as Event[];
     } catch (err) {
         console.error('Failed to fetch events:', err);
-        error.value = 'Failed to load events. Please try again.';
+        notificationStore.error('Failed to load events. Please try again.');
     } finally {
         loading.value = false;
     }
@@ -347,14 +328,6 @@ const getMemberInitials = (user: User) => {
     return firstNamePart + lastNamePart;
 };
 
-// Add a new member to the form
-const addMember = () => {
-    groupForm.value.members.push({
-        id: Date.now().toString(), // Temporary ID
-        name: '',
-        email: ''
-    });
-};
 
 // Remove a member from the form
 const removeMember = (index: number) => {
@@ -394,11 +367,11 @@ const addMemberInline = async () => {
             // reset form
             newMember.value = {firstname: '', lastname: '', email: ''};
         } else if (groupStore.error) {
-            error.value = groupStore.error;
+            notificationStore.error(groupStore.error);
         }
     } catch (e) {
         console.error('Failed to add member:', e);
-        error.value = 'Failed to add member. Please try again.';
+        notificationStore.error('Failed to add member. Please try again.');
     } finally {
         modalLoading.value = false;
     }
@@ -409,6 +382,7 @@ const removeMemberInline = async (memberId: string) => {
     if (memberId === group.value.createdBy) return; // protect creator
     modalLoading.value = true;
     try {
+        //TODO - Remake pour juste supprimer et pas update le groupe overkill
         const updatedMembers = group.value.members.filter(m => m.id !== memberId);
         const updated = await groupStore.updateGroup(
             group.value.id,
@@ -419,11 +393,11 @@ const removeMemberInline = async (memberId: string) => {
         if (updated) {
             group.value = updated;
         } else if (groupStore.error) {
-            error.value = groupStore.error;
+            notificationStore.error(groupStore.error);
         }
     } catch (e) {
         console.error('Failed to remove member:', e);
-        error.value = 'Failed to remove member. Please try again.';
+        notificationStore.error('Failed to remove member. Please try again.');
     } finally {
         modalLoading.value = false;
     }
@@ -453,24 +427,23 @@ const handleSubmitGroup = async (payload?: { name: string; background?: string; 
             group.value = updatedGroup;
             closeModals();
         } else {
-            error.value = groupStore.error || 'Failed to update group';
+            notificationStore.error(groupStore.error || 'Failed to update group');
         }
     } catch (err) {
         console.error('Failed to update group:', err);
-        error.value = 'Failed to update group. Please try again.';
+        notificationStore.error('Failed to update group. Please try again.');
     } finally {
         modalLoading.value = false;
     }
 };
 
 // Handle event form submission
-const handleSubmitEvent = async (payload?: {
+const handleSubmitEvent = async (payload: {
     id?: string;
     name: string;
     date: string;
-    background?: string;
-    scope?: 'single' | 'multiple';
-    targetPersonId?: string
+    background: string;
+    members?: { id: string; isTarget: boolean }[];
 }) => {
     const hasPayload = !!payload && !!payload.name && !!payload.date
     const hasForm = !!eventForm.value.name && !!eventForm.value.date
@@ -486,19 +459,19 @@ const handleSubmitEvent = async (payload?: {
             name,
             date,
             groupId,
-            payload?.scope,
-            payload?.targetPersonId
+            payload.background,
+            payload?.members
         );
 
         if (newEvent) {
             events.value.push(newEvent);
             closeModals();
         } else {
-            error.value = eventStore.error || 'Failed to create event';
+            notificationStore.error(eventStore.error || 'Failed to create event');
         }
     } catch (err) {
         console.error('Failed to create event:', err);
-        error.value = 'Failed to create event. Please try again.';
+        notificationStore.error('Failed to create event. Please try again.');
     } finally {
         modalLoading.value = false;
     }
@@ -524,11 +497,11 @@ const confirmDeleteEvent = async () => {
             events.value = events.value.filter(event => event.id !== currentEventId.value);
             showDeleteModal.value = false;
         } else {
-            error.value = eventStore.error || 'Failed to delete event';
+            notificationStore.error(eventStore.error || 'Failed to delete event');
         }
     } catch (err) {
         console.error('Failed to delete event:', err);
-        error.value = 'Failed to delete event. Please try again.';
+        notificationStore.error('Failed to delete event. Please try again.');
     } finally {
         modalLoading.value = false;
     }

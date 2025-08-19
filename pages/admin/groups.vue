@@ -17,7 +17,7 @@
             @click="showCreateModal = true"
             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-xs text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
-            <Icon name="heroicons-outline:plus" class="h-5 w-5 mr-2" />
+            <NuxtIcon name="heroicons-outline:plus" class="h-5 w-5 mr-2" />
             Add Group
           </button>
         </div>
@@ -41,7 +41,7 @@
 
       <!-- Loading state -->
       <div v-else-if="loading" class="flex justify-center items-center py-12">
-        <Icon name="line-md:loading-twotone-loop" class="animate-spin h-8 w-8 text-indigo-600" />
+        <NuxtIcon name="line-md:loading-twotone-loop" class="animate-spin h-8 w-8 text-indigo-600" />
       </div>
 
       <!-- Error state -->
@@ -96,7 +96,7 @@
             </div>
             <div class="mt-4">
               <p class="text-sm text-gray-500">
-                Created by: {{ getCreatorName(group.createdBy) }}
+                Created by: {{ getCreatorName(group.created_by) }}
               </p>
             </div>
           </div>
@@ -199,7 +199,7 @@
         <UiButton variant="primary" class="bg-red-600 hover:bg-red-700 focus:ring-red-500"
                   :disabled="modalLoading" @click="confirmDeleteGroup">
           <template #icon>
-            <Icon v-if="modalLoading" name="line-md:loading-twotone-loop" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
+            <NuxtIcon v-if="modalLoading" name="line-md:loading-twotone-loop" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
           </template>
           Delete
         </UiButton>
@@ -295,10 +295,11 @@ const remainingMembersNames = (group: Group) => {
 // Get creator name
 const getCreatorName = (creatorId: string) => {
   // Find the creator in all group members
+    console.log(creatorId);
   for (const group of groups.value) {
     const creator = group.members.find(member => member.id === creatorId);
     if (creator) {
-      return creator.name;
+      return creator.firstname + ' ' + creator.lastname;
     }
   }
   return 'Unknown';

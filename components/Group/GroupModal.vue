@@ -8,7 +8,7 @@
     <template #header>
       <div class="flex items-center gap-3">
         <div class="shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
-          <Icon name="mdi:account-group-outline" class="h-6 w-6 text-indigo-600" />
+          <NuxtIcon name="mdi:account-group-outline" class="h-6 w-6 text-indigo-600" />
         </div>
         <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
           {{ title || (mode === 'edit' ? t('groups.editGroup') : t('groups.createGroup')) }}
@@ -59,59 +59,13 @@
             Optional: Add a URL to a background image for your group
           </p>
         </div>
-
-        <!-- Members (hidden by default) -->
-        <div v-if="showMembersEditor" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">{{ t('groups.members') }}</label>
-            <p class="mt-1 text-xs text-gray-500">List of people in this group</p>
-          </div>
-
-          <ul class="divide-y divide-gray-200 border rounded-lg">
-            <li v-for="(member, index) in localForm.members" :key="index" class="flex items-center justify-between p-3">
-              <!-- Avatar + Infos -->
-              <div class="flex items-center gap-3">
-                <img
-                  :src="member.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(`${member.firstname} ${member.lastname}`)}&background=6366F1&color=fff`"
-                  alt="Avatar"
-                  class="w-10 h-10 rounded-full"
-                />
-                <div>
-                  <p class="text-sm font-medium text-gray-900">{{ member.firstname }} {{ member.lastname }}</p>
-                  <p class="text-xs text-gray-500">{{ member.email }}</p>
-                </div>
-              </div>
-
-              <!-- Remove button -->
-              <button
-                type="button"
-                @click="removeMember(index)"
-                class="ml-4 inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Icon name="heroicons-outline:x-mark" class="h-4 w-4" />
-              </button>
-            </li>
-
-            <!-- Add Member button -->
-            <li class="flex justify-center p-3">
-              <button
-                type="button"
-                @click="addMember"
-                class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-hidden"
-              >
-                <Icon name="heroicons-outline:plus" class="h-4 w-4 mr-1" />
-                {{ t('groups.addMember') }}
-              </button>
-            </li>
-          </ul>
-        </div>
       </form>
     </div>
 
     <template #footer>
       <UiButton form="group-form" type="submit" variant="primary" :disabled="loading || !localForm.name">
         <template #icon>
-          <Icon v-if="loading" name="line-md:loading-twotone-loop" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
+          <NuxtIcon v-if="loading" name="line-md:loading-twotone-loop" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
         </template>
         {{ submitLabel || (mode === 'edit' ? t('groups.editGroup') : t('groups.createGroup')) }}
       </UiButton>
@@ -157,9 +111,8 @@ const emit = defineEmits<{
 const { t } = useI18n();
 
 const mode = computed(() => props.mode ?? 'create');
-const loading = computed(() => props.loading === true);
-const showBackground = computed(() => props.showBackground !== false);
-const showMembersEditor = computed(() => props.showMembersEditor === true);
+const loading = computed(() => props.loading);
+const showBackground = computed(() => props.showBackground);
 
 const localForm = reactive<GroupFormLike>({
   name: props.initialGroup?.name || '',
@@ -191,28 +144,6 @@ watch(
   { deep: true }
 );
 
-const isCreator = (member: Partial<User>) => {
-  if (props.allowRemoveCreator) return false;
-  return !!props.creatorId && member.id === props.creatorId;
-};
-
-const addMember = () => {
-  localForm.members.push({
-    id: Date.now().toString(),
-    firstname: '',
-    lastname: '',
-    username: '',
-    email: '',
-    createdAt: new Date().toISOString()
-  });
-};
-
-const removeMember = (index: number) => {
-  const m = localForm.members[index];
-  if (isCreator(m)) return;
-  localForm.members.splice(index, 1);
-};
-
 const onSubmit = () => {
   if (!localForm.name) return;
   // Filter incomplete members: require at least email
@@ -243,19 +174,3 @@ onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleKeyDown);
 });
 </script>
-
-<style scoped>
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 150ms ease;
-}
-.fade-enter-from, .fade-leave-to {
-  opacity: 0;
-}
-.scale-fade-enter-active, .scale-fade-leave-active {
-  transition: opacity 150ms ease, transform 150ms ease;
-}
-.scale-fade-enter-from, .scale-fade-leave-to {
-  opacity: 0;
-  transform: translateY(0.5rem) scale(0.98);
-}
-</style>

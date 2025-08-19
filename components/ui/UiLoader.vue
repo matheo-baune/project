@@ -5,7 +5,7 @@
     :aria-label="ariaLabel || (label || 'Loading')"
     aria-live="polite"
   >
-    <Icon
+    <NuxtIcon
       :name="icon"
       :class="iconClasses"
       aria-hidden="true"

@@ -67,7 +67,6 @@ export default defineEventHandler(async (event) => {
             date: eventData.date,
             groupId: eventData.group_id.toString(),
             createdBy: eventData.created_by.toString(),
-            scope: (eventData.scope as string) || 'multiple',
             targetPersonId: eventData.target_person_id ? eventData.target_person_id.toString() : undefined
         };
     } catch (error) {

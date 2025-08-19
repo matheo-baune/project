@@ -44,7 +44,7 @@
         @click="handleReserve"
       >
         <template #icon>
-          <Icon v-if="loading" name="fa6-solid:spinner" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
+          <NuxtIcon v-if="loading" name="fa6-solid:spinner" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
         </template>
         {{ t('gifts.reserve') }}
       </UiButton>

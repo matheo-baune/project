@@ -37,25 +37,45 @@ export default defineEventHandler(async (event) => {
             });
         }
 
-        // Get all events for the group
+        // Get all events for the group with aggregated members and whether the current user is invited
         const result = await db.query(
-            `SELECT * FROM events
-             INNER JOIN event_members em ON id = em.event_id
-             WHERE group_id = $1 
-             ORDER BY date ASC`,
-            [groupId]
+            `SELECT 
+                e.*, 
+                EXISTS (
+                  SELECT 1 FROM event_members em2 
+                  WHERE em2.event_id = e.id AND em2.user_id = $2
+                ) AS is_invited,
+                COALESCE(
+                  json_agg(
+                    DISTINCT jsonb_build_object(
+                      'id', u.id,
+                      'firstname', u.firstname,
+                      'lastname', u.lastname,
+                      'avatar', u.avatar,
+                      'isTarget', em.is_target
+                    )
+                  ) FILTER (WHERE u.id IS NOT NULL), '[]'::json
+                ) AS members
+             FROM events e
+             LEFT JOIN event_members em ON em.event_id = e.id
+             LEFT JOIN users u ON u.id = em.user_id
+             WHERE e.group_id = $1 
+             GROUP BY e.id, e.name, e.date, e.background, e.description, e.group_id, e.created_by, e.created_at
+             ORDER BY e.date ASC`,
+            [groupId, userId]
         );
 
-        // Format the response
-        return result.rows.map(event => ({
-            id: event.id.toString(),
-            name: event.name,
-            date: event.date,
-            background: event.background,
-            description: event.description,
-            groupId: event.group_id.toString(),
-            createdBy: event.created_by.toString(),
-            members: event.members,
+        // Format the response (return a single entry per event)
+        return result.rows.map(row => ({
+            id: row.id.toString(),
+            name: row.name,
+            date: row.date,
+            background: row.background,
+            description: row.description,
+            groupId: row.group_id.toString(),
+            createdBy: row.created_by.toString(),
+            isInvited: row.is_invited,
+            members: row.members
         }));
     } catch (error : any) {
         console.error('Error fetching events for group:', error);
