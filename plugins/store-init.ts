@@ -1,12 +1,3 @@
-// Import all stores from the centralized exports
-import { 
-  useUserStore,
-  useThemeStore,
-  useGroupStore,
-  useEventStore,
-  useGiftStore
-} from '~/stores';
-
 export default defineNuxtPlugin({
   name: 'store-init-plugin',
   enforce: 'pre', // Run before other plugins

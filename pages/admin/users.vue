@@ -290,7 +290,6 @@
 import {ref, onMounted} from 'vue';
 import {useRouter} from 'vue-router';
 import type {User} from '~/types';
-import {useUserStore} from '~/stores';
 import {useI18n} from 'vue-i18n'
 import BaseModal from '~/components/ui/BaseModal.vue'
 import UiButton from '~/components/ui/UiButton.vue'

@@ -1,4 +1,3 @@
-import { useUserStore } from '~/stores';
 
 export default defineNuxtRouteMiddleware((to) => {
   // Public pages that don't require authentication

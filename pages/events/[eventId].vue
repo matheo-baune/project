@@ -208,13 +208,11 @@ import {ref, computed, onMounted, watch} from 'vue';
 import {useI18n} from 'vue-i18n'
 import {useRoute, useRouter} from 'vue-router';
 import type {Event, Gift, User} from '~/types';
-import {useUserStore, useEventStore, useGiftStore} from '~/stores';
 import EventModal from '~/components/Event/EventModal.vue';
 import EmptyStateCard from "~/components/ui/EmptyStateCard.vue";
 import UiButton from "~/components/ui/UiButton.vue";
 import GiftFormModal from "~/components/Gift/GiftFormModal.vue";
 import GiftCard from "~/components/Gift/GiftCard.vue";
-import {useNotificationStore} from '~/stores';
 
 const route = useRoute();
 const router = useRouter();
@@ -293,6 +291,8 @@ onMounted(async () => {
     }
 
     await fetchEvent();
+    await fetchGifts();
+    await fetchGroupMembers();
 
     useHead({
         title: `Wishlist - ${event.value?.name || ''}`
@@ -432,18 +432,17 @@ const handleDeleteGift = async (id: string) => {
     // Simple confirm; could be replaced with a nicer modal later
     if (!confirm(t('gifts.confirmDelete'))) return;
     loading.value = true;
-    error.value = '';
     try {
         const success = await giftStore.deleteGift(id);
         if (success) {
             gifts.value = gifts.value.filter(g => g.id !== id);
             notificationStore.success(t('gifts.deleteSuccess'));
         } else {
-            error.value = giftStore.error || t('gifts.errors.deleteFailed');
+            notificationStore.error(giftStore.error || t('gifts.errors.deleteFailed'));
         }
     } catch (e) {
         console.error('Failed to delete gift:', e);
-        error.value = t('gifts.errors.deleteFailed');
+        notificationStore.error(t('gifts.errors.deleteFailed'));
     } finally {
         loading.value = false;
     }
@@ -477,7 +476,6 @@ const openComments = (gift: Gift) => {
 // Confirm gift reservation
 const confirmReserveGift = async (giftId: string, name: string) => {
     loading.value = true;
-    error.value = '';
 
     try {
         const success = await giftStore.reserveGift(giftId, name);
@@ -498,11 +496,11 @@ const confirmReserveGift = async (giftId: string, name: string) => {
             // Show success toast
             notificationStore.success('Gift reserved successfully!')
         } else {
-            error.value = giftStore.error || 'Failed to reserve gift';
+            notificationStore.error(giftStore.error || 'Failed to reserve gift');
         }
     } catch (err) {
         console.error('Failed to reserve gift:', err);
-        error.value = 'Failed to reserve gift. Please try again.';
+        notificationStore.error('Failed to reserve gift. Please try again.');
     } finally {
         loading.value = false;
     }
@@ -511,7 +509,6 @@ const confirmReserveGift = async (giftId: string, name: string) => {
 // Handle cancellation of reservation
 const handleCancelReservation = async (giftId: string) => {
     loading.value = true;
-    error.value = '';
 
     try {
         const success = await giftStore.cancelReservation(giftId);
@@ -530,11 +527,11 @@ const handleCancelReservation = async (giftId: string) => {
             // Show success toast
             notificationStore.success('Reservation cancelled successfully!')
         } else {
-            error.value = giftStore.error || 'Failed to cancel reservation';
+            notificationStore.error(giftStore.error || 'Failed to cancel reservation');
         }
     } catch (err) {
         console.error('Failed to cancel reservation:', err);
-        error.value = 'Failed to cancel reservation. Please try again.';
+        notificationStore.error('Failed to cancel reservation. Please try again.');
     } finally {
         loading.value = false;
     }
@@ -543,7 +540,6 @@ const handleCancelReservation = async (giftId: string) => {
 // Handle event update (legacy handler retained for potential route usage)
 const handleUpdateEvent = async (id: string, name: string, date: string, background?: string, scope?: 'single' | 'multiple', targetPersonId?: string) => {
     loading.value = true;
-    error.value = '';
 
     try {
         const updatedEvent = await eventStore.updateEvent(id, name, date, background, scope, targetPersonId);
@@ -553,11 +549,11 @@ const handleUpdateEvent = async (id: string, name: string, date: string, backgro
             showEventEditModal.value = false;
             notificationStore.success('Event updated successfully!')
         } else {
-            error.value = eventStore.error || 'Failed to update event';
+            notificationStore.error(eventStore.error || 'Failed to update event');
         }
     } catch (err) {
         console.error('Failed to update event:', err);
-        error.value = 'Failed to update event. Please try again.';
+        notificationStore.error('Failed to update event. Please try again.');
     } finally {
         loading.value = false;
     }

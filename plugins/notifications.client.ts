@@ -1,5 +1,3 @@
-import { useNotificationStore } from '~/stores'
-
 export default defineNuxtPlugin(() => {
   if (!process.client) return
 

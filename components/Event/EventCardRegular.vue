@@ -39,10 +39,10 @@
           <tr>
             <td class="py-2">
               <div class="flex justify-between">
-                <NuxtLink :to="`/events/${event.id}/edit`" class="flex items-center text-gray-500 hover:text-gray-700" @click.stop>
+                <button @click.stop="$emit('edit', event)" class="flex items-center text-gray-500 hover:text-gray-700">
                   <NuxtIcon name="heroicons-outline:pencil-square" class="h-4 w-4 mr-1" />
                   Edit
-                </NuxtLink>
+                </button>
                 <button @click.stop="$emit('delete', event.id)" class="flex items-center text-red-500 hover:text-red-700">
                   <NuxtIcon name="heroicons-outline:trash" class="h-4 w-4 mr-1" />
                   Delete

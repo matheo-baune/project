@@ -144,6 +144,7 @@
                                 :event="event"
                                 :displayMode="displayMode"
                                 @delete="handleDeleteEvent"
+                                @edit="openEditEvent"
                             />
                         </div>
                     </div>
@@ -151,15 +152,28 @@
             </div>
         </div>
 
-        <!-- Create/Edit Event Modal -->
+        <!-- Create Event Modal -->
         <EventModal
             :model-value="showCreateEventModal"
             mode="create"
             :loading="modalLoading"
-            :members="group?.members"
+            :members="group?.members || []"
             @update:modelValue="(val) => { if (!val) closeModals() }"
             @cancel="closeModals"
             @submit="handleSubmitEvent"
+        />
+
+        <!-- Edit Event Modal -->
+        <EventModal
+            v-if="selectedEventForEdit"
+            :model-value="showEditEventModal"
+            mode="edit"
+            :loading="modalLoading"
+            :initial-event="selectedEventForEdit"
+            :members="group?.members || []"
+            @update:modelValue="(val) => { if (!val) closeModals() }"
+            @cancel="closeModals"
+            @submit="(payload) => handleUpdateEventFromModal(payload)"
         />
 
         <!-- Edit Group Modal -->
@@ -214,11 +228,10 @@
 import {ref, onMounted} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import type {Group, Event, User} from '~/types';
-import {useUserStore, useGroupStore, useEventStore, useNotificationStore} from '~/stores';
 import GroupModal from '~/components/group/GroupModal.vue';
 import BaseModal from "~/components/ui/BaseModal.vue";
 import UiButton from "~/components/ui/UiButton.vue";
-import EventModal from "~/components/event/EventModal.vue";
+import EventModal from "~/components/Event/EventModal.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -240,6 +253,8 @@ const displayMode = ref<'card' | 'large'>('card');
 
 // Modal state
 const showCreateEventModal = ref(false);
+const showEditEventModal = ref(false);
+const selectedEventForEdit = ref<Event | null>(null);
 const showEditGroupModal = ref(false);
 const showDeleteModal = ref(false);
 const modalLoading = ref(false);
@@ -477,6 +492,12 @@ const handleSubmitEvent = async (payload: {
     }
 };
 
+// Open edit event modal
+const openEditEvent = (ev: Event) => {
+    selectedEventForEdit.value = ev;
+    showEditEventModal.value = true;
+};
+
 // Handle delete event
 const handleDeleteEvent = (eventId: string) => {
     currentEventId.value = eventId;
@@ -510,6 +531,8 @@ const confirmDeleteEvent = async () => {
 // Close all modals and reset forms
 const closeModals = () => {
     showCreateEventModal.value = false;
+    showEditEventModal.value = false;
+    selectedEventForEdit.value = null;
     showEditGroupModal.value = false;
     showDeleteModal.value = false;
 
@@ -531,3 +554,26 @@ const closeModals = () => {
     currentEventId.value = '';
 };
 </script>
+
+
+// Update event from modal (edit)
+const handleUpdateEventFromModal = async (payload: { id?: string; name: string; date: string; background?: string; scope?: 'single' | 'multiple'; targetPersonId?: string }) => {
+    const id = payload.id || selectedEventForEdit.value?.id
+    if (!id) return
+    modalLoading.value = true
+    try {
+        const updated = await eventStore.updateEvent(id, payload.name, payload.date, payload.background, payload.scope, payload.targetPersonId)
+        if (updated) {
+            const idx = events.value.findIndex(e => e.id === id)
+            if (idx !== -1) events.value[idx] = updated as Event
+            closeModals()
+        } else {
+            notificationStore.error(eventStore.error || 'Failed to update event')
+        }
+    } catch (e) {
+        console.error('Failed to update event:', e)
+        notificationStore.error('Failed to update event. Please try again.')
+    } finally {
+        modalLoading.value = false
+    }
+}

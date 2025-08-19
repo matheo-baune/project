@@ -138,7 +138,6 @@
 definePageMeta({ layout: 'auth' })
 import {ref, onMounted, watch} from 'vue';
 import {useRouter} from 'vue-router';
-import {useUserStore} from '~/stores';
 import {useI18n} from 'vue-i18n';
 
 // Define reactive variables
@@ -166,6 +165,7 @@ watch(() => password.value, (newValue) => {
 // Get router, user store, and i18n
 const router = useRouter();
 const userStore = useUserStore();
+const notificationStore = useNotificationStore();
 const {t} = useI18n();
 
 // Handle login form submission

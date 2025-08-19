@@ -160,7 +160,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useUserStore } from '~/stores';
 import { useI18n } from 'vue-i18n'
 import BaseModal from '~/components/ui/BaseModal.vue'
 import UiButton from '~/components/ui/UiButton.vue'

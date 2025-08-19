@@ -39,10 +39,10 @@
           View Gifts
         </NuxtLink>
         <div class="flex space-x-2">
-          <NuxtLink :to="`/events/${event.id}/edit`" class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-gray-700 bg-white hover:bg-gray-50" @click.stop>
+          <button @click.stop="$emit('edit', event)" class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-gray-700 bg-white hover:bg-gray-50">
             <Icon name="heroicons-outline:pencil-square" class="h-4 w-4 mr-1" />
             Edit
-          </NuxtLink>
+          </button>
           <button @click.stop="$emit('delete', event.id)" class="inline-flex items-center px-2 py-1 border border-gray-300 shadow-xs text-xs font-medium rounded-sm text-red-700 bg-white hover:bg-red-50">
             <Icon name="heroicons-outline:trash" class="h-4 w-4 mr-1" />
             Delete

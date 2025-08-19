@@ -6,21 +6,6 @@
         <UiLoader size="lg" color="text-indigo-600" :label="t('common.loading')" />
       </div>
       
-      <!-- Error state -->
-      <div v-else-if="error" class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-        <div class="flex">
-          <div class="shrink-0">
-            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-            </svg>
-          </div>
-          <div class="ml-3">
-            <p class="text-sm text-red-700">
-              {{ error }}
-            </p>
-          </div>
-        </div>
-      </div>
       
       <!-- Event content -->
       <div v-else>
@@ -84,7 +69,6 @@ import { ref, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router';
 import type { Event, Gift } from '~/types';
-import { useEventStore, useGiftStore, useNotificationStore } from '~/stores';
 import EmptyStateCard from "~/components/ui/EmptyStateCard.vue";
 
 const route = useRoute();
@@ -97,7 +81,6 @@ const eventId = route.params.eventId as string;
 
 // State
 const loading = ref(true);
-const error = ref('');
 const event = ref<Event | null>(null);
 const gifts = ref<any[]>([]); // Using any to accommodate the isReserved property
 
@@ -130,7 +113,6 @@ onMounted(async () => {
 // Fetch public event
 const fetchPublicEvent = async () => {
   loading.value = true;
-  error.value = '';
   
   try {
     const fetchedEvent = await eventStore.getPublicEvent(eventId);
@@ -138,11 +120,11 @@ const fetchPublicEvent = async () => {
     if (fetchedEvent) {
       event.value = fetchedEvent;
     } else {
-      error.value = eventStore.error || 'Event not found';
+      notificationStore.error(eventStore.error || 'Event not found');
     }
   } catch (err) {
     console.error('Failed to fetch event:', err);
-    error.value = 'Failed to load event. Please try again.';
+    notificationStore.error('Failed to load event. Please try again.');
   } finally {
     loading.value = false;
   }
@@ -153,14 +135,13 @@ const fetchPublicGifts = async () => {
   if (!eventId) return;
   
   loading.value = true;
-  error.value = '';
   
   try {
     const fetchedGifts = await giftStore.getPublicGiftsByEventId(eventId);
     gifts.value = fetchedGifts;
   } catch (err) {
     console.error('Failed to fetch gifts:', err);
-    error.value = 'Failed to load gifts. Please try again.';
+    notificationStore.error('Failed to load gifts. Please try again.');
   } finally {
     loading.value = false;
   }
@@ -179,7 +160,6 @@ const handleReserveGift = (giftId: string) => {
 // Confirm gift reservation
 const confirmReserveGift = async (giftId: string, name: string) => {
   loading.value = true;
-  error.value = '';
   
   try {
     const success = await giftStore.reserveGift(giftId, name);
@@ -200,11 +180,11 @@ const confirmReserveGift = async (giftId: string, name: string) => {
       // Show success toast
       notificationStore.success('Gift reserved successfully! Thank you!')
     } else {
-      error.value = giftStore.error || 'Failed to reserve gift';
+      notificationStore.error(giftStore.error || 'Failed to reserve gift');
     }
   } catch (err) {
     console.error('Failed to reserve gift:', err);
-    error.value = 'Failed to reserve gift. Please try again.';
+    notificationStore.error('Failed to reserve gift. Please try again.');
   } finally {
     loading.value = false;
   }

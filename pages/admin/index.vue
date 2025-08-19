@@ -195,12 +195,6 @@
 <script setup lang="ts">
 import {ref, onMounted} from 'vue';
 import {useRouter} from 'vue-router';
-import {
-    useUserStore,
-    useGroupStore,
-    useEventStore,
-    useGiftStore
-} from '~/stores';
 
 const router = useRouter();
 const userStore = useUserStore();

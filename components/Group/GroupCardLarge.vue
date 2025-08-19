@@ -55,7 +55,6 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Group, User } from '~/types'
-import { useUserStore } from '~/stores'
 
 const props = defineProps<{ group: Group }>()
 const emit = defineEmits<{ (e: 'click', group: Group): void; (e: 'edit', group: Group): void; (e: 'delete', id: string): void }>()

@@ -138,7 +138,6 @@ import {onMounted, ref, watch} from 'vue';
 import {useRouter} from 'vue-router';
 import { useI18n } from 'vue-i18n'
 import type {Group, User} from '~/types';
-import {useUserStore, useGroupStore, useNotificationStore} from '~/stores';
 import GroupModal from '~/components/group/GroupModal.vue';
 import EmptyStateCard from "~/components/ui/EmptyStateCard.vue";
 import UiLoader from "~/components/ui/UiLoader.vue";

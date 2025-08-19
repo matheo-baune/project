@@ -1,6 +1,5 @@
 import {defineStore} from 'pinia';
 import type {Gift, Reservation} from '~/types';
-import {useUserStore} from './index';
 
 export const useGiftStore = defineStore('gift', {
     state: () => ({

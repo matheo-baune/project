@@ -31,9 +31,6 @@
             ref="nameInput"
           />
         </div>
-        <p v-if="error" class="mt-2 text-sm text-red-600">
-          {{ error }}
-        </p>
       </div>
     </div>
 
@@ -57,7 +54,6 @@
 import { useI18n } from 'vue-i18n'
 import { ref, onMounted, watch, nextTick } from 'vue';
 import type { Gift } from '~/types';
-import { useUserStore } from '~/stores';
 import BaseModal from '~/components/ui/BaseModal.vue'
 import UiButton from '~/components/ui/UiButton.vue'
 
@@ -75,8 +71,8 @@ const { t } = useI18n()
 const userStore = useUserStore();
 const name = ref('');
 const loading = ref(false);
-const error = ref('');
 const nameInput = ref<HTMLInputElement | null>(null);
+const notificationStore = useNotificationStore();
 
 // Initialize name with user's name if available
 onMounted(() => {
@@ -98,22 +94,21 @@ watch(() => props.isOpen, (isOpen) => {
 // Handle reservation
 const handleReserve = async () => {
   if (!name.value.trim()) {
-    error.value = 'Please enter your name';
+    notificationStore.error('Please enter your name');
     return;
   }
 
   if (!props.gift) {
-    error.value = 'No gift selected';
+    notificationStore.error('No gift selected');
     return;
   }
 
   loading.value = true;
-  error.value = '';
 
   try {
     emit('reserve', props.gift.id, name.value.trim());
   } catch (err) {
-    error.value = 'Failed to reserve gift';
+    notificationStore.error('Failed to reserve gift');
     console.error(err);
   } finally {
     loading.value = false;

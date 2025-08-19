@@ -215,7 +215,6 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import type { Group, User } from '~/types';
-import { useUserStore, useGroupStore } from '~/stores';
 import GroupModal from '~/components/group/GroupModal.vue';
 import BaseModal from "~/components/ui/BaseModal.vue";
 import UiButton from "~/components/ui/UiButton.vue";
@@ -223,6 +222,7 @@ import UiButton from "~/components/ui/UiButton.vue";
 const router = useRouter();
 const userStore = useUserStore();
 const groupStore = useGroupStore();
+const notificationStore = useNotificationStore();
 
 // State
 const loading = ref(true);
@@ -273,7 +273,7 @@ const fetchGroups = async () => {
     groups.value = fetchedGroups;
   } catch (err) {
     console.error('Failed to fetch groups:', err);
-    error.value = 'Failed to load groups. Please try again.';
+    notificationStore.error('Failed to load groups. Please try again.');
   } finally {
     loading.value = false;
   }
@@ -342,11 +342,11 @@ const confirmDeleteGroup = async () => {
       groups.value = groups.value.filter(group => group.id !== currentGroupId.value);
       showDeleteModal.value = false;
     } else {
-      error.value = groupStore.error || 'Failed to delete group';
+      notificationStore.error(groupStore.error || 'Failed to delete group');
     }
   } catch (err) {
     console.error('Failed to delete group:', err);
-    error.value = 'Failed to delete group. Please try again.';
+    notificationStore.error('Failed to delete group. Please try again.');
   } finally {
     modalLoading.value = false;
   }
@@ -393,12 +393,12 @@ const handleSubmitGroup = async (payload?: { name: string; members: User[] }) =>
         }
         closeModals();
       } else {
-        error.value = groupStore.error || 'Failed to update group';
+        notificationStore.error(groupStore.error || 'Failed to update group');
       }
     }
   } catch (err) {
     console.error('Failed to save group:', err);
-    error.value = 'Failed to save group. Please try again.';
+    notificationStore.error('Failed to save group. Please try again.');
   } finally {
     modalLoading.value = false;
   }

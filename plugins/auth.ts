@@ -1,5 +1,3 @@
-import { useUserStore } from '~/stores';
-
 // This plugin is kept for backward compatibility
 // Store initialization is now handled by store-init.ts plugin
 export default defineNuxtPlugin({

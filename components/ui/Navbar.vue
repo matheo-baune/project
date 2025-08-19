@@ -198,7 +198,6 @@
 <script setup lang="ts">
 import {ref, computed, onMounted, onUnmounted} from 'vue';
 import {useRouter} from 'vue-router';
-import {useUserStore, useThemeStore} from '~/stores';
 import LanguageSwitcher from '~/components/ui/LanguageSwitcher.vue';
 import {useI18n} from "vue-i18n";
 

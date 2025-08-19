@@ -237,7 +237,6 @@
 definePageMeta({ layout: 'auth' })
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useUserStore } from '~/stores';
 import { useI18n } from 'vue-i18n';
 
 // Define reactive variables

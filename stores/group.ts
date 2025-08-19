@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import type { Group, User } from '~/types';
-import { useUserStore } from '~/stores';
 
 export const useGroupStore = defineStore('group', {
     state: () => ({
